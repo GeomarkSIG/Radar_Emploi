@@ -113,13 +113,12 @@ header.top .titles p{margin:6px 0 0; color:var(--text-muted); font-size:14.5px; 
 .type-btn.on{color:var(--accent-ink); border-color:var(--accent); background:var(--accent-soft);}
 .type-btn .c{font-family:'IBM Plex Mono',monospace; opacity:.7; margin-left:4px;}
 
-.layout{display:grid; grid-template-columns: 1.55fr 1fr; gap:18px; align-items:start;}
-@media (max-width:860px){ .layout{grid-template-columns:1fr;} }
+.layout{display:flex; flex-direction:column; gap:18px;}
 
 .panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); overflow:hidden;}
 .map-wrap{padding:0; position:relative;}
-#map{height:560px; width:100%; background:var(--surface-2);}
-@media (max-width:640px){ #map{height:420px;} }
+#map{height:78vh; min-height:540px; width:100%; background:var(--surface-2);}
+@media (max-width:640px){ #map{height:62vh; min-height:420px;} }
 
 .basemap-toggle{
   position:absolute; top:10px; right:10px; z-index:500; display:flex; gap:4px;
@@ -189,17 +188,13 @@ footer{margin-top:26px; font-size:12px; color:var(--text-muted); text-align:cent
 <header class="top">
   <div class="titles">
     <h1>Radar Emploi Geomark</h1>
-    <p>Carte mondiale des annonces cartographie / SIG / géomatique (emplois et appels d'offres) repérées par la veille. Filtrez par ancienneté, statut ou type de contrat ; zoomez pour séparer les annonces groupées ; cliquez un point pour le détail.</p>
+    <p>Carte mondiale des annonces cartographie / SIG / géomatique EN COURS (emplois et appels d'offres) repérées par la veille — Réunion/Mayotte toujours affichées même sans statut confirmé. Filtrez par type de contrat ; zoomez pour séparer les annonces groupées ; cliquez un point pour le détail.</p>
   </div>
   <div class="stats" id="stats"></div>
 </header>
 
 <div class="sandbox-note" id="sandboxNote">Le fond de carte met un instant à charger selon la connexion — les points, le regroupement et les filtres restent utilisables pendant ce temps.</div>
 
-<div class="filter-label">Ancienneté de l'annonce</div>
-<div class="daybar" id="daybar"></div>
-<div class="filter-label">Statut</div>
-<div class="legend" id="legend"></div>
 <div class="filter-label">Type de contrat</div>
 <div class="legend" id="typeFilter"></div>
 
@@ -254,103 +249,33 @@ function parseFR(d){ // dd/mm/yyyy -> Date
   return new Date(yyyy, mm-1, dd);
 }
 
-const TODAY = new Date(); TODAY.setHours(0,0,0,0);
-function ageDays(dateStr){
-  const d = parseFR(dateStr);
-  if(!d) return null;
-  return Math.round((TODAY - d) / 86400000);
-}
-
-const AGE_BUCKETS = [
-  {id:'d0', label:"Aujourd'hui", test:a=>a===0},
-  {id:'d1', label:'J-1', test:a=>a===1},
-  {id:'d2', label:'J-2', test:a=>a===2},
-  {id:'d3', label:'J-3', test:a=>a===3},
-  {id:'d4', label:'J-4', test:a=>a===4},
-  {id:'d5', label:'J-5', test:a=>a===5},
-  {id:'d6', label:'J-6', test:a=>a===6},
-  {id:'mid', label:'8 à 15 jours', test:a=>a>=7 && a<=15},
-  {id:'old', label:'16 à 30 jours', test:a=>a>=16 && a<=30},
-  {id:'ancient', label:'+ 30 jours', test:a=>a>30},
-];
+// La carte ne montre que les annonces EN COURS (pas de filtre statut/ancienneté à l'affichage) :
+// le tri historique/expiré/écarté reste consultable dans les fichiers de suivi, pas ici.
+// En cours partout, + DOM-TOM toujours affichés même sans statut confirmé (faible volume là-bas,
+// on préfère montrer le peu qu'on a plutôt que de vider la carte sur cette zone prioritaire).
+const OPEN_DATA = DATA.filter(p=> p.categorie==='ouverte' || p.zone==='reunion' || p.zone==='mayotte');
 
 const state = {
-  day:'all', selected:null,
-  statuses:new Set(Object.keys(STATUS_META)),
   types:new Set(Object.keys(TYPE_META)),
 };
 
-function matchesDay(p){
-  if(state.day==='all') return true;
-  if(state.day==='unknown') return !p.date_detection;
-  const bucket = AGE_BUCKETS.find(b=>b.id===state.day);
-  if(!bucket) return true;
-  const a = ageDays(p.date_detection);
-  return a!==null && bucket.test(a);
-}
-
 function filteredPoints(){
-  return DATA.filter(p=>{
-    if(!state.statuses.has(p.categorie)) return false;
-    if(!state.types.has(p.type_contrat)) return false;
-    return matchesDay(p);
-  });
+  return OPEN_DATA.filter(p=> state.types.has(p.type_contrat));
 }
 
 function renderStats(){
-  const total = DATA.length;
-  const open = DATA.filter(p=>p.categorie==='ouverte').length;
-  const withDate = DATA.filter(p=>p.date_detection);
-  const days = new Set(withDate.map(p=>p.date_detection));
+  const total = OPEN_DATA.length;
+  const withDate = OPEN_DATA.filter(p=>p.date_detection);
   const last = withDate.length ? withDate.reduce((a,b)=> parseFR(a.date_detection)>parseFR(b.date_detection)?a:b).date_detection : '—';
   const el = document.getElementById('stats');
   el.innerHTML = `
-    <div class="stat-chip"><div class="n">${total}</div><div class="l">Annonces</div></div>
-    <div class="stat-chip"><div class="n">${open}</div><div class="l">En cours</div></div>
-    <div class="stat-chip"><div class="n">${days.size}</div><div class="l">Jours couverts</div></div>
+    <div class="stat-chip"><div class="n">${total}</div><div class="l">Annonces affichées</div></div>
     <div class="stat-chip"><div class="n" style="font-size:14px">${last}</div><div class="l">Dernière annonce</div></div>
   `;
 }
 
-function renderDayBar(){
-  const el = document.getElementById('daybar');
-  const base = DATA.filter(p=> state.statuses.has(p.categorie) && state.types.has(p.type_contrat));
-  const unknownCount = base.filter(p=>!p.date_detection).length;
-  let html = `<div class="day-chip ${state.day==='all'?'active':''}" data-day="all">Toutes les annonces<span class="c">${base.length}</span></div>`;
-  AGE_BUCKETS.forEach(b=>{
-    const c = base.filter(p=>{ const a=ageDays(p.date_detection); return a!==null && b.test(a); }).length;
-    html += `<div class="day-chip ${state.day===b.id?'active':''}" data-day="${b.id}">${b.label}<span class="c">${c}</span></div>`;
-  });
-  if(unknownCount){
-    html += `<div class="day-chip ${state.day==='unknown'?'active':''}" data-day="unknown">Date inconnue<span class="c">${unknownCount}</span></div>`;
-  }
-  el.innerHTML = html;
-  el.querySelectorAll('.day-chip').forEach(c=>c.addEventListener('click', ()=>{
-    state.day = c.dataset.day; renderAll();
-  }));
-}
-
-function renderLegend(){
-  const pts = DATA.filter(p=> matchesDay(p) && state.types.has(p.type_contrat));
-  const el = document.getElementById('legend');
-  el.innerHTML = Object.keys(STATUS_META).map(k=>{
-    const meta = STATUS_META[k];
-    const n = pts.filter(p=>p.categorie===k).length;
-    const on = state.statuses.has(k);
-    return `<button class="status-btn ${on?'on':''}" data-status="${k}" style="--dotc:${resolveVar(meta.color)}">
-      <span class="dot" style="background:${resolveVar(meta.color)}"></span>${meta.label}<span class="c">${n}</span>
-    </button>`;
-  }).join('');
-  el.querySelectorAll('.status-btn').forEach(b=>b.addEventListener('click', ()=>{
-    const k = b.dataset.status;
-    if(state.statuses.has(k) && state.statuses.size>1) state.statuses.delete(k);
-    else state.statuses.add(k);
-    renderAll();
-  }));
-}
-
 function renderTypeFilter(){
-  const pts = DATA.filter(p=> matchesDay(p) && state.statuses.has(p.categorie));
+  const pts = OPEN_DATA;
   const el = document.getElementById('typeFilter');
   el.innerHTML = Object.keys(TYPE_META).map(k=>{
     const meta = TYPE_META[k];
@@ -504,7 +429,7 @@ function closeDetail(){ document.getElementById('overlay').classList.remove('ope
 document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeDetail(); });
 
 function renderAll(){
-  renderDayBar(); renderLegend(); renderTypeFilter(); renderMap(); renderList();
+  renderTypeFilter(); renderMap(); renderList();
 }
 renderStats();
 initMap();
