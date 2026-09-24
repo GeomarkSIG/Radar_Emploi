@@ -105,6 +105,7 @@ header.top .titles .lead{margin:8px 0 0; color:var(--text); font-size:15.5px; li
   font-size:12.5px; font-weight:500; background:var(--surface); border:1px solid var(--border);
   border-radius:999px; padding:6px 11px; cursor:pointer; color:var(--text-muted);
 }
+.type-btn.bulk{border-style:dashed; color:var(--ember); border-color:var(--ember); font-weight:600;}
 .type-btn.on{color:var(--accent-ink); border-color:var(--accent); background:var(--accent-soft);}
 .type-btn .c{font-family:'IBM Plex Mono',monospace; opacity:.7; margin-left:4px;}
 .type-btn .sw{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle;}
@@ -266,11 +267,11 @@ const TYPE_META = {
   cdi:          {label:'CDI', color:'#1E8F6B'},
   cdd:          {label:'CDD', color:'#D9622C'},
   interim:      {label:'Intérim', color:'#2E86AB'},
-  volontariat:  {label:'Volontariat', color:'#8E44AD'},
+  volontariat:  {label:'VSC', color:'#8E44AD'},
   freelance:    {label:'Freelance', color:'#C2185B'},
   ao:           {label:"Appel d'offre", color:'#8D5B2D'},
   stage:        {label:'Stage', color:'#00ACC1'},
-  apprentissage:{label:'Apprentissage', color:'#7CB342'},
+  apprentissage:{label:'Alternance', color:'#7CB342'},
   autre:        {label:'Autre / à préciser', color:'#78716C'},
 };
 function resolveVar(v){
@@ -322,10 +323,19 @@ function renderTypeFilter(){
   }).join('');
   el.querySelectorAll('.type-btn').forEach(b=>b.addEventListener('click', ()=>{
     const k = b.dataset.type;
-    if(state.types.has(k) && state.types.size>1) state.types.delete(k);
+    if(state.types.has(k)) state.types.delete(k);
     else state.types.add(k);
     renderAll();
   }));
+  const all = document.createElement('button');
+  all.className='type-btn bulk';
+  const everything = state.types.size>0;   // au moins un filtre coche -> proposer de tout decocher
+  all.textContent = everything ? '✕ Tout décocher' : '✓ Tout cocher';
+  all.addEventListener('click', ()=>{
+    state.types = everything ? new Set() : new Set(Object.keys(TYPE_META));
+    renderAll();
+  });
+  el.appendChild(all);
 }
 
 const searchInput = document.getElementById('searchInput');
