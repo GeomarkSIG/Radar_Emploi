@@ -1,5 +1,5 @@
-<title>Radar Emploi Geomark</title>
-<meta name="description" content="Carte interactive mondiale des annonces cartographie / SIG / géomatique (emplois et appels d'offres) repérées par la veille quotidienne, filtrable par ancienneté, statut et type de contrat.">
+<title>Radar Emploi</title>
+<meta name="description" content="Carte interactive mondiale des annonces cartographie / SIG / géomatique en cours (emplois et appels d'offres), France, DOM-TOM et international. Mise à jour quotidienne.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,680&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
@@ -16,14 +16,8 @@
   --accent-ink:#0A4A44;
   --accent-soft:#D8ECE7;
   --ember:#D9622C;
-  --status-open:#1E8F6B;
-  --status-open-soft:#DCF0E7;
-  --status-expired:#8D9187;
-  --status-expired-soft:#E8E6DC;
-  --status-rejected:#B0544F;
-  --status-rejected-soft:#F1DFDB;
-  --status-unknown:#B8892E;
-  --status-unknown-soft:#F1E5CB;
+  --open:#1E8F6B;
+  --open-soft:#DCF0E7;
   --shadow: 0 1px 2px rgba(30,25,10,.06), 0 8px 24px -12px rgba(30,25,10,.18);
   color-scheme: light;
 }
@@ -31,11 +25,7 @@
   :root:not([data-theme="light"]){
     --bg:#171A15; --surface:#1F231C; --surface-2:#262B21; --text:#ECE8DC;
     --text-muted:#A6AA98; --border:#3A3F30; --accent:#3FB39F; --accent-ink:#A9E8DA;
-    --accent-soft:#20332E; --ember:#E98455;
-    --status-open:#57C69B; --status-open-soft:#1C3A2E;
-    --status-expired:#9AA090; --status-expired-soft:#2B2E25;
-    --status-rejected:#DB8E88; --status-rejected-soft:#3A2320;
-    --status-unknown:#E0B657; --status-unknown-soft:#3A3018;
+    --accent-soft:#20332E; --ember:#E98455; --open:#57C69B; --open-soft:#1C3A2E;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.55);
     color-scheme: dark;
   }
@@ -43,11 +33,7 @@
 :root[data-theme="dark"]{
   --bg:#171A15; --surface:#1F231C; --surface-2:#262B21; --text:#ECE8DC;
   --text-muted:#A6AA98; --border:#3A3F30; --accent:#3FB39F; --accent-ink:#A9E8DA;
-  --accent-soft:#20332E; --ember:#E98455;
-  --status-open:#57C69B; --status-open-soft:#1C3A2E;
-  --status-expired:#9AA090; --status-expired-soft:#2B2E25;
-  --status-rejected:#DB8E88; --status-rejected-soft:#3A2320;
-  --status-unknown:#E0B657; --status-unknown-soft:#3A3018;
+  --accent-soft:#20332E; --ember:#E98455; --open:#57C69B; --open-soft:#1C3A2E;
   --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.55);
   color-scheme: dark;
 }
@@ -82,30 +68,25 @@ header.top .titles p{margin:6px 0 0; color:var(--text-muted); font-size:14.5px; 
 }
 .sandbox-note.show{display:block;}
 
-.filter-label{font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--text-muted); margin:10px 0 5px;}
-.daybar{
-  display:flex; gap:6px; overflow-x:auto; padding:2px 2px 10px; margin-bottom:6px;
-  -webkit-overflow-scrolling:touch;
+.search-row{margin:14px 0 6px;}
+.search-box{
+  display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:10px 14px; box-shadow:var(--shadow); max-width:480px;
 }
-.daybar::-webkit-scrollbar{height:6px;}
-.daybar::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px;}
-.day-chip{
-  flex:0 0 auto; font-family:'IBM Plex Mono',monospace; font-size:12px;
-  background:var(--surface); border:1px solid var(--border); border-radius:999px;
-  padding:6px 12px; cursor:pointer; color:var(--text); white-space:nowrap;
+.search-box svg{flex:0 0 auto; opacity:.55;}
+.search-box input{
+  border:none; outline:none; background:none; font-family:'IBM Plex Sans',sans-serif; font-size:14px;
+  color:var(--text); width:100%;
 }
-.day-chip.active{background:var(--accent); border-color:var(--accent); color:#fff;}
-.day-chip .c{opacity:.65; margin-left:5px;}
+.search-box input::placeholder{color:var(--text-muted);}
+.search-box .clear{
+  display:none; border:none; background:var(--surface-2); color:var(--text-muted); border-radius:6px;
+  width:22px; height:22px; cursor:pointer; font-size:13px; line-height:1; flex:0 0 auto;
+}
+.search-box .clear.show{display:block;}
 
+.filter-label{font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--text-muted); margin:10px 0 5px;}
 .legend{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
-.status-btn{
-  display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500;
-  background:var(--surface); border:1px solid var(--border); border-radius:999px;
-  padding:6px 11px 6px 8px; cursor:pointer; color:var(--text-muted);
-}
-.status-btn .dot{width:9px; height:9px; border-radius:50%; flex:0 0 auto;}
-.status-btn.on{color:var(--text); box-shadow:0 0 0 1px var(--dotc) inset;}
-.status-btn .c{font-family:'IBM Plex Mono',monospace; opacity:.7;}
 .type-btn{
   font-size:12.5px; font-weight:500; background:var(--surface); border:1px solid var(--border);
   border-radius:999px; padding:6px 11px; cursor:pointer; color:var(--text-muted);
@@ -137,7 +118,7 @@ header.top .titles p{margin:6px 0 0; color:var(--text-muted); font-size:14.5px; 
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .cluster-badge{box-shadow:0 0 0 4px rgba(63,179,159,.28);} }
 :root[data-theme="dark"] .cluster-badge{box-shadow:0 0 0 4px rgba(63,179,159,.28);}
-.pt-dot{border-radius:50%; box-shadow:0 0 0 2px var(--surface);}
+.pt-dot{border-radius:50%; box-shadow:0 0 0 2px var(--surface); background:var(--open);}
 
 .list-head{display:flex; align-items:center; justify-content:space-between; padding:14px 16px 8px;}
 .list-head h3{font-size:16px;}
@@ -149,7 +130,7 @@ header.top .titles p{margin:6px 0 0; color:var(--text-muted); font-size:14.5px; 
 }
 .list-item:hover{background:var(--surface-2);}
 .list-item.selected{background:var(--accent-soft);}
-.list-item .sw{width:9px; height:9px; border-radius:50%; margin-top:5px; flex:0 0 auto;}
+.list-item .sw{width:9px; height:9px; border-radius:50%; margin-top:5px; flex:0 0 auto; background:var(--open);}
 .list-item .body{min-width:0;}
 .list-item .t{font-size:13.5px; font-weight:500; line-height:1.3; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;}
 .list-item .m{font-size:11.5px; color:var(--text-muted); margin-top:2px;}
@@ -170,11 +151,10 @@ header.top .titles p{margin:6px 0 0; color:var(--text-muted); font-size:14.5px; 
 }
 .detail-card h3{font-size:19px; margin-bottom:4px; padding-right:40px;}
 .detail-card .emp{color:var(--text-muted); font-size:14px; margin-bottom:14px;}
-.badge{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500; padding:4px 10px; border-radius:999px; margin-bottom:14px;}
+.badge{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500; padding:4px 10px; border-radius:999px; margin-bottom:14px; background:var(--open-soft); color:var(--open);}
 .detail-card dl{display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:13.5px; margin:0 0 16px;}
 .detail-card dt{color:var(--text-muted);}
 .detail-card dd{margin:0;}
-.detail-card .statut-txt{font-size:12.5px; color:var(--text-muted); background:var(--surface-2); border-radius:8px; padding:10px 12px; margin-bottom:16px; line-height:1.5;}
 .btn-link{
   display:inline-block; background:var(--accent); color:#fff; text-decoration:none;
   font-size:14px; font-weight:500; padding:10px 18px; border-radius:9px;
@@ -187,13 +167,21 @@ footer{margin-top:26px; font-size:12px; color:var(--text-muted); text-align:cent
 
 <header class="top">
   <div class="titles">
-    <h1>Radar Emploi Geomark</h1>
-    <p>Carte mondiale des annonces cartographie / SIG / géomatique EN COURS (emplois et appels d'offres) repérées par la veille — uniquement les annonces en cours, chacune avec sa date de publication. Filtrez par type de contrat ; zoomez pour séparer les annonces groupées ; cliquez un point pour le détail.</p>
+    <h1>Radar Emploi</h1>
+    <p>Carte mondiale des annonces cartographie / SIG / géomatique EN COURS (emplois et appels d'offres) — France, DOM-TOM et international. Recherchez par mot-clé, filtrez par type de contrat, zoomez pour séparer les annonces groupées, cliquez un point pour le détail.</p>
   </div>
   <div class="stats" id="stats"></div>
 </header>
 
-<div class="sandbox-note" id="sandboxNote">Le fond de carte met un instant à charger selon la connexion — les points, le regroupement et les filtres restent utilisables pendant ce temps.</div>
+<div class="sandbox-note" id="sandboxNote">Le fond de carte peut ne pas s'afficher dans cet aperçu Claude (restriction réseau de la sandbox) — il s'affiche normalement une fois la page hébergée. Les points, le regroupement et les filtres restent fonctionnels ici.</div>
+
+<div class="search-row">
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="searchInput" placeholder="Rechercher (mot-clé, employeur, ville, pays…)">
+    <button class="clear" id="searchClear" aria-label="Effacer">✕</button>
+  </div>
+</div>
 
 <div class="filter-label">Type de contrat</div>
 <div class="legend" id="typeFilter"></div>
@@ -212,21 +200,15 @@ footer{margin-top:26px; font-size:12px; color:var(--text-muted); text-align:cent
   </div>
 </div>
 
-<footer>Geomark SIG Solutions — données issues d'une veille quotidienne automatisée sur les sites d'emploi et portails de marchés publics. Mise à jour chaque jour ; seules les annonces confirmées en cours et datées sont publiées ici. Fond de carte © Esri, © OpenStreetMap contributors.</footer>
+<footer>Radar Emploi — maintenu par Geomark SIG Solutions. Données issues d'une veille quotidienne automatisée sur des sites d'emploi et portails de marchés publics. Seules les annonces confirmées en cours sont publiées, chacune avec sa date de publication. Fond de carte © Esri, © OpenStreetMap contributors.</footer>
 
 <div class="detail-overlay" id="overlay">
   <div class="detail-card" id="detailCard"></div>
 </div>
 
 <script>
-const DATA = [{"titre":"Chargé·e SIG","employeur":"CartONG","lieu":"Chambéry (73) ou télétravail total (poste ouvert à l'international)","contrat":"CDD 12 mois ou consultance (selon pays de résidence)","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137379","statut":"En cours","date_detection":"14/09/2026","categorie":"ouverte","liste":"reunion_mayotte_remote","zone":"metropole","lat":45.5646,"lon":5.9178},{"titre":"Développement webmap - Initiative Fleuve Sénégal (IFS)","employeur":"Groupe Initiatives (Gi) / Grdr, pour le compte du consortium IFS","lieu":"A distance (mission Mali/Mauritanie/Sénégal/Guinée)","contrat":"Prestation freelance (offres à déposer avant le 25/09/2026, socle ferme plafonné à 8 500 € TTC)","type_contrat":"freelance","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137474","statut":"En cours","date_detection":"15/09/2026","categorie":"ouverte","liste":"reunion_mayotte_remote","zone":"remote","lat":12.6392,"lon":-8.0029},{"titre":"Responsable du service Information Géographique (H/F)","employeur":"Région Île de la Réunion","lieu":"Saint-Pierre (relocalisation prévue à Saint-Denis), La Réunion","contrat":"Emploi permanent FPT (cadre d'emplois Ingénieurs territoriaux), contractuel possible jusqu'à 3 ans renouvelable dans la limite de 6 ans","type_contrat":"cdi","source":"emploi-territorial.fr","url":"https://www.emploi-territorial.fr/offre/o974260916000436-responsable-service-information-gEographique","statut":"En cours","date_detection":"18/09/2026","categorie":"ouverte","liste":"reunion_mayotte_remote","zone":"reunion","lat":-21.3393,"lon":55.4781},{"titre":"Business developer SIG","employeur":"Géotech (filiale groupe Parera)","lieu":"Rueil-Malmaison (92)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137469","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":48.8778,"lon":2.1811},{"titre":"Technicien(ne) SIG","employeur":"CA Pays de Grasse","lieu":"Grasse (06)","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137468","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.6584,"lon":6.9229},{"titre":"Géomaticien(ne)","employeur":"CBNPMP (Conservatoire Botanique National Pyrénées-Midi-Pyrénées)","lieu":"Bagnères-de-Bigorre (65)","contrat":"CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137466","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.0667,"lon":-0.15},{"titre":"Technicien SIG F/H","employeur":"Brest Métropole","lieu":"Brest (29)","contrat":"FPT","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137456","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":48.3904,"lon":-4.4861},{"titre":"Chargé d'études socio-économiques/cartographie","employeur":"non précisé (poste LTA)","lieu":"Angers (49)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137448","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.4784,"lon":-0.5632},{"titre":"Technicien géomaticien (F/H)","employeur":"non précisé (poste MOCQUARD Isabelle)","lieu":"Vannes (56)","contrat":"FPT","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137444","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.6582,"lon":-2.7608},{"titre":"Formateur / Animateur de communauté SIG","employeur":"non précisé (poste spetre)","lieu":"Monaco","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137441","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.7384,"lon":7.4246},{"titre":"Développeur géomaticien FME expérimenté F/H","employeur":"Coexya","lieu":"Lyon (69)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137439","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":45.764,"lon":4.8357},{"titre":"Développeur ArcGis","employeur":"Coexya","lieu":"Lyon (69)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137438","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":45.764,"lon":4.8357},{"titre":"Géomaticien cartographe (H/F)","employeur":"non précisé (poste Géraldine BRUYERE)","lieu":"Saint-Étienne (42)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137434","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":45.4397,"lon":4.3872},{"titre":"Géomaticien(ne)","employeur":"CBN Pyrénéen","lieu":"Bagnères-de-Bigorre (65)","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137429","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.0667,"lon":-0.15},{"titre":"Technicien(ne) Terrain GPS Réseaux d'Eau Potable (H/F)","employeur":"non précisé (poste Ades)","lieu":"Eure (27)","contrat":"CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137425","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":49.1,"lon":1.15},{"titre":"Chef-fe d'unité SIG","employeur":"non précisé (poste DANIEL)","lieu":"Côtes-d'Armor, Bretagne (22)","contrat":"FPE","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137423","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":48.5,"lon":-2.75},{"titre":"Chef de Projet SIG - Géomaticien expert H/F","employeur":"non précisé (poste Julia DILEK)","lieu":"Loire-Atlantique (44)","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137417","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.3,"lon":-1.5},{"titre":"Géomaticien SUEZ EAU France","employeur":"SUEZ","lieu":"Franche-Comté (25)","contrat":"CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137403","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.25,"lon":6.0333},{"titre":"Référent Applications SIG H/F","employeur":"Magellium","lieu":"Nantes (44)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137402","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.2184,"lon":-1.5536},{"titre":"Chef(fe) de projet IDG (Infrastructure de Données Géographiques)","employeur":"OpenIG","lieu":"Montpellier (34)","contrat":"CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137401","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.6108,"lon":3.8767},{"titre":"Géomaticien(ne)","employeur":"SDIS 89","lieu":"Yonne (89)","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137400","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.7982,"lon":3.5731},{"titre":"Géomatique & Statistiques Spatiales H/F","employeur":"Magellium","lieu":"Nantes (44)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137397","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.2184,"lon":-1.5536},{"titre":"Ingénieur SIG Confirmé H/F","employeur":"Magellium","lieu":"Nantes (44)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137396","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.2184,"lon":-1.5536},{"titre":"Responsable SIG H/F","employeur":"non précisé (poste Romane_Bazzano)","lieu":"Beinheim (67)","contrat":"CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137395","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":48.8167,"lon":7.9833},{"titre":"Développeur d'Applicatifs SIG Métiers (H/F)","employeur":"Métropole de Lyon","lieu":"Lyon (69)","contrat":"FPT","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137374","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":45.764,"lon":4.8357},{"titre":"Gestionnaire des systèmes d'information (SIP/SIG)","employeur":"Quimper Bretagne Occidentale (DPVB)","lieu":"Quimper (29)","contrat":"Emploi permanent (FPT, technicien)","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137449","statut":"En cours","date_detection":"14/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.996,"lon":-4.0972},{"titre":"Administrateur.trice Data/SIG","employeur":"Naturalia Environnement (écosystème Alkïos)","lieu":"Avignon (84), possibilité Montpellier (34)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137375","statut":"En cours","date_detection":"14/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.9493,"lon":4.8055},{"titre":"Géomaticien Expert - Développeur SIG H/F","employeur":"Step Up","lieu":"Toulouse (31)","contrat":"CDI","type_contrat":"cdi","source":"hellowork.com","url":"https://www.hellowork.com/fr-fr/emplois/82546855.html","statut":"En cours","date_detection":"14/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.6047,"lon":1.4442},{"titre":"Référent Technique Encadrant - SIG H/F","employeur":"GROUPE PARERA","lieu":"L'Isle-Jourdain (32)","contrat":"CDI","type_contrat":"cdi","source":"hellowork.com","url":"https://www.hellowork.com/fr-fr/emplois/82613794.html","statut":"En cours","date_detection":"14/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.6167,"lon":1.0833},{"titre":"Technicien SIG H/F","employeur":"Egis Groupe","lieu":"Balma (31)","contrat":"CDD","type_contrat":"cdd","source":"hellowork.com","url":"https://www.hellowork.com/fr-fr/emplois/83002295.html","statut":"En cours","date_detection":"14/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.6167,"lon":1.5},{"titre":"Ingénieur d'études données spatialisées - Observatoire Spatialisé Régional de l'Agroécologie (OSERA) / projet MAIA","employeur":"UMR TREE - Université de Pau et des Pays de l'Adour","lieu":"Pau (64)","contrat":"CDD 20 mois","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137447","statut":"En cours","date_detection":"15/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":43.2951,"lon":-0.3708},{"titre":"Chargé.e de mission gestion des données du projet Life espèces marines mobiles (F/H) - réf. 2026/4575","employeur":"Office Français de la Biodiversité (OFB)","lieu":"Brest (29)","contrat":"Contrat de projet 36 mois, catégorie A","type_contrat":"cdd","source":"georezo.net (forum Job) / ofb.gestmax.fr","url":"https://ofb.gestmax.fr/4575/1/charge-e-mission-gestion-des-donnees-life-especes-mobiles-f-h","statut":"En cours","date_detection":"15/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":48.3904,"lon":-4.4861},{"titre":"Chargé/e d'études SIG (débutant)","employeur":"Agence d'urbanisme du Cotentin et de la Manche","lieu":"Valognes (50)","contrat":"CDD 6 mois","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137485","statut":"En cours","date_detection":"16/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":49.5167,"lon":-1.4667},{"titre":"Géomaticien-ne","employeur":"Eurométropole de Strasbourg","lieu":"Strasbourg (67)","contrat":"FPT/CDD (1 à 3 ans selon profil)","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137484","statut":"En cours","date_detection":"16/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":48.5734,"lon":7.7521},{"titre":"Géomaticien QGIS/PostgreSQL - maintenance SIG MONITOR FISH","employeur":"Centre national de surveillance des pêches (CNSP)","lieu":"Etel (56) - présentiel, pas de télétravail","contrat":"Prestation freelance, 2-3j/semaine pendant ~6 mois, début octobre 2026","type_contrat":"freelance","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137477","statut":"En cours","date_detection":"16/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.65,"lon":-3.2},{"titre":"Technicien(ne) SIG réseaux électriques ENEDIS","employeur":"CRIT (agence Montpellier) pour ENEDIS","lieu":"Nantes (44)","contrat":"Intérim, 4 mois renouvelable jusqu'à 1 an","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137476","statut":"En cours","date_detection":"16/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.2184,"lon":-1.5536},{"titre":"Responsable de programme SIG (H/F)","employeur":"Métropole de Lyon","lieu":"Lyon (69)","contrat":"Emploi permanent (titulaire ou contractuel, contrat jusqu'à 3 ans renouvelable jusqu'à 6 ans)","type_contrat":"cdi","source":"emploi-territorial.fr","url":"https://www.emploi-territorial.fr/offre/o069260916000244-responsable-programme-sig","statut":"En cours","date_detection":"17/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":45.764,"lon":4.8357},{"titre":"Geomaticien·ne","employeur":"CEN Normandie","lieu":"Hérouville-Saint-Clair, Caen (14)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137489","statut":"En cours","date_detection":"17/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":49.2058,"lon":-0.3403},{"titre":"Géomaticien/ne","employeur":"Agence d'attractivité et de développement (Redon Agglomération)","lieu":"Redon (35)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137501","statut":"En cours","date_detection":"21/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.65,"lon":-2.0833},{"titre":"Ingénieur data SIG - Données géographiques H/F","employeur":"Nantes Métropole (Direction Géomatique et Observation)","lieu":"Nantes (44)","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137500","statut":"En cours","date_detection":"21/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":47.2184,"lon":-1.5536},{"titre":"Technicien/ne SIG (contrat DSP assainissement)","employeur":"Saur","lieu":"Buc (78)","contrat":"CDI","type_contrat":"cdi","source":"georezo.net (forum Job)","url":"https://georezo.net/forum/viewtopic.php?id=137498","statut":"En cours","date_detection":"21/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":48.7667,"lon":2.15},{"titre":"Ingénieur géomaticien H/F","employeur":"PROMAN Tertiaire (intérim, client spécialisé données géographiques)","lieu":"Mérignac (33)","contrat":"Intérim, temps plein","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214DKMP","statut":"En cours","date_detection":"23/09/2026","categorie":"ouverte","liste":"metropole_secondaire","zone":"metropole","lat":44.8333,"lon":-0.65},{"titre":"PORTS / PATRIMOINE BATI / VOIRIE ET INFRASTRUCTURES / FONCIER - Prestations de géomètres et relevés — Lot 1 (Ports : géomètre, bathymétrie, plans topographie), Lot 3 (Bâtiments/Voirie : topographie, relevés de sites) et Lot 4 (Bâtiments/Voirie : géodétection) sur 5 lots au total","employeur":"Commune d'Hyères","lieu":"83","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-84310%22","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":43.1242,"lon":5.928},{"titre":"26N0331 - Détection et géoréférencement de réseaux","employeur":"Métropole Nice Côte d'Azur","lieu":"06","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-78239%22","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":43.7102,"lon":7.262},{"titre":"Accompagnement à la mise en oeuvre des différentes briques logicielles de Georchestra et de Mviewer","employeur":"Département de la Haute-Loire","lieu":"43","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-73981%22","statut":"En cours","date_detection":"11/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":45.043,"lon":3.885},{"titre":"Acquisition, mise en oeuvre et maintenance d'une solution de Cartographie du SI","employeur":"Rennes Métropole","lieu":"35","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-85495%22","statut":"En cours","date_detection":"14/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":48.1173,"lon":-1.6778},{"titre":"Assistance à maîtrise d'ouvrage pour la mise en qualité et la migration des données du réseau d'assainissement vers ArcGIS Utility Network","employeur":"Métropole européenne de Lille","lieu":"59","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-83989%22","statut":"En cours","date_detection":"14/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":50.6292,"lon":3.0573},{"titre":"Conception, mise en page et fourniture de cartes destinées à l'impression pour des panneaux relatifs aux itinéraires de randonnées et aux parcs naturels départementaux — Lot 1 (Cartographie destinée aux panneaux d'offres de randonnées) et Lot 2 (Cartographie destinée aux panneaux d'informations des parcs naturels départementaux) sur 2 lots au total - marché intégralement cartographique","employeur":"Conseil départemental des Alpes-Maritimes - Direction de l'Environnement et de la Gestion des Risques","lieu":"06","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-89009%22","statut":"En cours","date_detection":"16/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":43.7102,"lon":7.262},{"titre":"26PI03 - Accord-cadre pour la réalisation et justification de la cartographie locale d'exposition au recul du trait de côte (CLERTC) sur l'ensemble du littoral de la Métropole Toulon Provence Méditerranée","employeur":"Métropole Toulon Provence Méditerranée","lieu":"83/06/13","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-89702%22","statut":"En cours","date_detection":"18/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":43.1242,"lon":5.928},{"titre":"Définition et cartographie de l'aléa inondation sur une partie du fleuve Loire","employeur":"DDT de la Loire","lieu":"42","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-82818%22","statut":"En cours","date_detection":"21/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":45.4397,"lon":4.3872},{"titre":"AMO Cartographie SI","employeur":"Grand Paris Aménagement","lieu":"75","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-83396%22","statut":"En cours","date_detection":"21/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":48.8566,"lon":2.3522},{"titre":"Collecte et mise en valeur des données territoriales, conception graphique de cartographies communicantes et production de documents de communication","employeur":"GRANDLYON Métropole","lieu":"69","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-76120%22","statut":"En cours","date_detection":"21/09/2026","categorie":"ouverte","liste":"avis_deja_vus","zone":"metropole","lat":45.764,"lon":4.8357},{"titre":"Évaluation des risques et cartographie des zones à risques en rapport avec le secteur Infrastructures Energie et Infrastructures TIC","employeur":"Madagascar Digital and Energy Connectivity for Inclusion in Madagascar Project (Banque Mondiale)","lieu":"Madagascar","contrat":"Appel d'offre","type_contrat":"ao","source":"Portail AO international","url":"https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00466085","statut":"En cours","date_detection":"22/09/2026","categorie":"ouverte","liste":"avis_deja_vus_international_secondaires","zone":"madagascar","lat":-18.9,"lon":47.5}];
+const DATA = [{"titre":"Géomaticien (H/F)","employeur":"SATME","lieu":"L'Isle-d'Abeau (38)","pays":"France","contrat":"CDD","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214HBWC","date_detection":"24/09/2026","lat":45.6167,"lon":5.2333},{"titre":"Ingénieur géomaticien (H/F)","employeur":"PROMAN (client gestion données géographiques)","lieu":"Mérignac (33)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214DKMP","date_detection":"24/09/2026","lat":44.8333,"lon":-0.65},{"titre":"Géomaticien (H/F)","employeur":"Agence d'Attractivité et de Développement","lieu":"Redon (35)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214CKXP","date_detection":"24/09/2026","lat":48.12,"lon":-1.68},{"titre":"Géomaticien(ne) - Chargé(e) de prospection foncière (H/F)","employeur":"AUTORECHARGE","lieu":"Pantin (93)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213WTPG","date_detection":"24/09/2026","lat":48.8964,"lon":2.4014},{"titre":"Géomaticien / Technicien SIG (H/F)","employeur":"ADECCO FRANCE","lieu":"Nantes (44)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213PLHP","date_detection":"24/09/2026","lat":47.2184,"lon":-1.5536},{"titre":"Technicien géomaticien / Technicienne géomaticienne (H/F)","employeur":"Régie de l'Eau","lieu":"St Médard de Guizières (33)","pays":"France","contrat":"CDD","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213FJYM","date_detection":"24/09/2026","lat":44.9333,"lon":-0.0833},{"titre":"Dessinateur SIG F/H (H/F)","employeur":"SDEA","lieu":"Saverne (67)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214GDPZ","date_detection":"24/09/2026","lat":48.7411,"lon":7.3622},{"titre":"Chargé de projet SIG H/F","employeur":"Saint Étienne Métropole","lieu":"Saint-Étienne (42)","pays":"France","contrat":"CDD","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214FYQQ","date_detection":"24/09/2026","lat":45.4397,"lon":4.3872},{"titre":"Cartographe F/H (H/F)","employeur":"Survey","lieu":"Metz (57)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214FWQC","date_detection":"24/09/2026","lat":49.1193,"lon":6.1757},{"titre":"Cartographe F/H (H/F)","employeur":"Survey","lieu":"Lille (59)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214FWPW","date_detection":"24/09/2026","lat":50.6292,"lon":3.0573},{"titre":"Consultant / Développeur SIG-GIS (H/F)","employeur":"ADECCO Tertiaire","lieu":"Mérignac (33)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214FVBX","date_detection":"24/09/2026","lat":44.8333,"lon":-0.65},{"titre":"Référent Technique Cartographie Réseaux (H/F)","employeur":"Forum Miremont - Digitanie","lieu":"Ramonville-Saint-Agne (31)","pays":"France","contrat":"CDD","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213XNWH","date_detection":"24/09/2026","lat":43.55,"lon":1.4833},{"titre":"Technicien géomatique et télédétection (H/F)","employeur":"I-SEA","lieu":"Pessac (33)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213NWNF","date_detection":"24/09/2026","lat":44.8058,"lon":-0.6314},{"titre":"Cartographe (H/F)","employeur":"Enedis","lieu":"Toulouse (31)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214GSRB","date_detection":"24/09/2026","lat":43.6047,"lon":1.4442},{"titre":"Cartographe (h/f) (H/F)","employeur":"Adecco (client distribution électricité)","lieu":"Pennes-Mirabeau (13)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/214FGNK","date_detection":"24/09/2026","lat":43.4167,"lon":5.3167},{"titre":"Dessinateur cartographe junior (H/F)","employeur":"NGI Consulting","lieu":"Vendargues (34)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213YMMN","date_detection":"24/09/2026","lat":43.65,"lon":3.9833},{"titre":"Cartographe (H/F)","employeur":"Adéquat Solutions RH (client EDF)","lieu":"Le Port (974)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213SLFY","date_detection":"24/09/2026","lat":-20.9373,"lon":55.2919},{"titre":"Cartographe F/H (H/F)","employeur":"Survey","lieu":"Martigues (13)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213BNYB","date_detection":"24/09/2026","lat":43.405,"lon":5.0472},{"titre":"Cartographe F/H (H/F)","employeur":"Survey","lieu":"Ronchin (59)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213BNXB","date_detection":"24/09/2026","lat":50.6017,"lon":3.1017},{"titre":"Cartographe F/H (H/F)","employeur":"Survey","lieu":"Saint-Priest (69)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213BNTV","date_detection":"24/09/2026","lat":45.6975,"lon":4.9481},{"titre":"Géomètre-Topographe itinérant (H/F)","employeur":"DAM Essentiel","lieu":"Les Billaux (33)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/213KFSY","date_detection":"24/09/2026","lat":44.9333,"lon":-0.2833},{"titre":"Cartographe Géomaticien(ne) - F/H","employeur":"Auddicé","lieu":"Saumur (49)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/7128127","date_detection":"24/09/2026","lat":47.26,"lon":-0.08},{"titre":"Cartographe Dessinateur H/F","employeur":"PROMAN","lieu":"Montpellier (34)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/7082845","date_detection":"24/09/2026","lat":43.6108,"lon":3.8767},{"titre":"Cartographe (H/F)","employeur":"Manpower","lieu":"Marseille (13)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/7073769","date_detection":"24/09/2026","lat":43.2965,"lon":5.3698},{"titre":"Cartographe (H/F)","employeur":"Manpower France","lieu":"Kingersheim (68)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"francetravail.fr","url":"https://candidat.francetravail.fr/offres/recherche/detail/7069367","date_detection":"24/09/2026","lat":47.7847,"lon":7.3244},{"titre":"Chef(fe) de projet DataAnalyst - Hypervision","employeur":"Grand Paris Seine Ouest (GPSO) - DIGIT","lieu":"Meudon (92)","pays":"France","contrat":"CDD/FPT","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137517","date_detection":"24/09/2026","lat":48.8144,"lon":2.235},{"titre":"Valorisation des données LiDAR HD du territoire (stage)","employeur":"CRIGE Normandie","lieu":"Rouen / Normandie (76)","pays":"France","contrat":"Stage","type_contrat":"stage","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137516","date_detection":"24/09/2026","lat":49.4432,"lon":1.0999},{"titre":"Ingénieur data SIG - Données géographiques H/F","employeur":"Nantes Métropole","lieu":"Nantes (44)","pays":"France","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137500","date_detection":"24/09/2026","lat":47.2184,"lon":-1.5536},{"titre":"Commercial SIG / Technico-commercial SIG - Business Developer","employeur":"Géotech (groupe Parera)","lieu":"Rueil-Malmaison (92)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137499","date_detection":"24/09/2026","lat":48.83,"lon":2.26},{"titre":"Technicien/ne SIG (contrat DSP assainissement)","employeur":"Saur","lieu":"Buc (78)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137498","date_detection":"24/09/2026","lat":48.8,"lon":2.13},{"titre":"Chargé/e d'études SIG (débutant)","employeur":"Agence d'urbanisme du Cotentin et de la Manche","lieu":"Valognes (50)","pays":"France","contrat":"CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137485","date_detection":"24/09/2026","lat":49.5167,"lon":-1.4667},{"titre":"Géomaticien-ne","employeur":"Eurométropole de Strasbourg","lieu":"Strasbourg (67)","pays":"France","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137484","date_detection":"24/09/2026","lat":48.5734,"lon":7.7521},{"titre":"Géomaticien QGIS/PostgreSQL - maintenance SIG MONITOR FISH","employeur":"Centre national de surveillance des pêches (CNSP)","lieu":"Etel (56)","pays":"France","contrat":"Freelance","type_contrat":"freelance","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137477","date_detection":"24/09/2026","lat":47.65,"lon":-3.2},{"titre":"Technicien(ne) SIG réseaux électriques ENEDIS","employeur":"CRIT (pour Enedis)","lieu":"Nantes (44)","pays":"France","contrat":"Intérim","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137476","date_detection":"24/09/2026","lat":47.2184,"lon":-1.5536},{"titre":"Développement webmap - Initiative Fleuve Sénégal (IFS)","employeur":"Groupe Initiatives / Grdr","lieu":"À distance (mission Mali/Mauritanie/Sénégal/Guinée)","pays":"France","contrat":"Freelance","type_contrat":"freelance","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137474","date_detection":"24/09/2026","lat":12.6392,"lon":-8.0029},{"titre":"Business developer SIG","employeur":"Géotech (groupe Parera)","lieu":"Rueil-Malmaison (92)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137469","date_detection":"24/09/2026","lat":48.83,"lon":2.26},{"titre":"Technicien(ne) SIG","employeur":"CA Pays de Grasse","lieu":"Grasse (06)","pays":"France","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137468","date_detection":"24/09/2026","lat":43.6584,"lon":6.9229},{"titre":"Géomaticien(ne)","employeur":"CBNPMP","lieu":"Bagnères-de-Bigorre (65)","pays":"France","contrat":"CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137466","date_detection":"24/09/2026","lat":43.0667,"lon":-0.15},{"titre":"Géomaticien (F/M/X) - alternance","employeur":"Nîmes Métropole (secteur)","lieu":"Nîmes (30)","pays":"France","contrat":"Apprentissage","type_contrat":"apprentissage","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137450","date_detection":"24/09/2026","lat":43.8367,"lon":4.3601},{"titre":"Gestionnaire bases de données Espaces verts","employeur":"Quimper Bretagne Occidentale","lieu":"Quimper (29)","pays":"France","contrat":"FPT","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137449","date_detection":"24/09/2026","lat":47.996,"lon":-4.0972},{"titre":"Chargé d'études socio-économiques/cartographie","employeur":"LTA","lieu":"Angers (49)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137448","date_detection":"24/09/2026","lat":47.4784,"lon":-0.5632},{"titre":"Technicien géomaticien (F/H)","employeur":"Vannes agglomération (secteur)","lieu":"Vannes (56)","pays":"France","contrat":"FPT","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137444","date_detection":"24/09/2026","lat":47.6582,"lon":-2.7608},{"titre":"Formateur / Animateur de communauté SIG","employeur":"Spetre","lieu":"Monaco","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137441","date_detection":"24/09/2026","lat":43.7384,"lon":7.4246},{"titre":"Développeur géomaticien FME expérimenté F/H","employeur":"Coexya","lieu":"Lyon (69)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137439","date_detection":"24/09/2026","lat":45.764,"lon":4.8357},{"titre":"Développeur ArcGIS","employeur":"Coexya","lieu":"Lyon (69)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137438","date_detection":"24/09/2026","lat":45.764,"lon":4.8357},{"titre":"Géomaticien cartographe (H/F)","employeur":"Employeur non précisé","lieu":"Saint-Étienne (42)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137434","date_detection":"24/09/2026","lat":45.4397,"lon":4.3872},{"titre":"Chef de Projet SIG - Géomaticien expert H/F","employeur":"Employeur non précisé (44)","lieu":"Loire-Atlantique (44)","pays":"France","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137417","date_detection":"24/09/2026","lat":47.22,"lon":-1.55},{"titre":"Géomaticien SUEZ EAU France","employeur":"Suez","lieu":"Franche-Comté (25)","pays":"France","contrat":"CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137403","date_detection":"24/09/2026","lat":47.24,"lon":6.02},{"titre":"Référent Applications SIG H/F","employeur":"Magellium","lieu":"Nantes (44)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137402","date_detection":"24/09/2026","lat":47.2184,"lon":-1.5536},{"titre":"Chef(fe) de projet IDG (Infrastructure de Données Géographiques)","employeur":"OpenIG","lieu":"Montpellier (34)","pays":"France","contrat":"CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137401","date_detection":"24/09/2026","lat":43.6108,"lon":3.8767},{"titre":"Géomaticien(ne)","employeur":"SDIS 89","lieu":"Yonne (89)","pays":"France","contrat":"FPT/CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137400","date_detection":"24/09/2026","lat":47.8,"lon":3.57},{"titre":"Géomatique & Statistiques Spatiales H/F","employeur":"Magellium","lieu":"Nantes (44)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137397","date_detection":"24/09/2026","lat":47.2184,"lon":-1.5536},{"titre":"Ingénieur SIG Confirmé H/F","employeur":"Magellium","lieu":"Nantes (44)","pays":"France","contrat":"CDI","type_contrat":"cdi","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137396","date_detection":"24/09/2026","lat":47.2184,"lon":-1.5536},{"titre":"Responsable SIG H/F","employeur":"Employeur non précisé","lieu":"Beinheim (67)","pays":"France","contrat":"CDD","type_contrat":"cdd","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137395","date_detection":"24/09/2026","lat":48.8167,"lon":7.9833},{"titre":"Assistant(e) Cartographe - alternance","employeur":"Employeur non précisé","lieu":"Nice (06)","pays":"France","contrat":"Apprentissage","type_contrat":"apprentissage","source":"georezo.net","url":"https://georezo.net/forum/viewtopic.php?id=137393","date_detection":"24/09/2026","lat":43.7102,"lon":7.262},{"titre":"PORTS / PATRIMOINE BÂTI / VOIRIE ET INFRASTRUCTURES / FONCIER — Prestations de géomètres et relevés (Lots 1, 3, 4) (date limite 30/09/2026)","employeur":"Commune d'Hyères","lieu":"Hyères (83)","pays":"France","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-84310%22","date_detection":"24/09/2026","lat":43.1198,"lon":6.1286},{"titre":"Détection et géoréférencement de réseaux (date limite 01/10/2026)","employeur":"Métropole Nice Côte d'Azur","lieu":"Nice (06)","pays":"France","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-78239%22","date_detection":"24/09/2026","lat":43.7102,"lon":7.262},{"titre":"Acquisition, mise en œuvre et maintenance d'une solution de Cartographie du SI (date limite 06/10/2026)","employeur":"Rennes Métropole","lieu":"Rennes (35)","pays":"France","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-85495%22","date_detection":"24/09/2026","lat":48.1173,"lon":-1.6778},{"titre":"AMO mise en qualité et migration des données du réseau d'assainissement vers ArcGIS Utility Network (date limite 02/10/2026)","employeur":"Métropole européenne de Lille","lieu":"Lille (59)","pays":"France","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-83989%22","date_detection":"24/09/2026","lat":50.6292,"lon":3.0573},{"titre":"Conception, mise en page et fourniture de cartes pour panneaux (itinéraires de randonnées et parcs naturels) (date limite 16/10/2026)","employeur":"Conseil départemental des Alpes-Maritimes","lieu":"Alpes-Maritimes (06)","pays":"France","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-89009%22","date_detection":"24/09/2026","lat":43.71,"lon":7.26},{"titre":"Accord-cadre pour la réalisation et justification de la cartographie locale d'exposition au recul du trait de côte (CLERTC) (date limite 19/10/2026)","employeur":"Métropole Toulon Provence Méditerranée","lieu":"Toulon (83)","pays":"France","contrat":"Appel d'offre","type_contrat":"ao","source":"BOAMP","url":"https://www.boamp.fr/pages/avis?q=idweb:%2226-89702%22","date_detection":"24/09/2026","lat":43.12,"lon":5.93}]; // deja filtre "en cours uniquement" en amont (build_radar_data.py)
 
-const STATUS_META = {
-  ouverte:  {label:'En cours',   color:'var(--status-open)',     soft:'var(--status-open-soft)'},
-  expiree:  {label:'Expirée',    color:'var(--status-expired)',  soft:'var(--status-expired-soft)'},
-  ecartee:  {label:'Écartée',    color:'var(--status-rejected)', soft:'var(--status-rejected-soft)'},
-  inconnu:  {label:'Non datée',  color:'var(--status-unknown)',  soft:'var(--status-unknown-soft)'},
-};
 const TYPE_META = {
   cdi:          {label:'CDI'},
   cdd:          {label:'CDD'},
@@ -242,40 +224,40 @@ function resolveVar(v){
   const name = v.slice(4,-1);
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
-
-function parseFR(d){ // dd/mm/yyyy -> Date
+function parseFR(d){
   if(!d) return null;
   const [dd,mm,yyyy] = d.split('/').map(Number);
   return new Date(yyyy, mm-1, dd);
 }
 
-// La carte ne montre que les annonces EN COURS (pas de filtre statut/ancienneté à l'affichage) :
-// le tri historique/expiré/écarté reste consultable dans les fichiers de suivi, pas ici.
-// En cours partout, + DOM-TOM toujours affichés même sans statut confirmé (faible volume là-bas,
-// on préfère montrer le peu qu'on a plutôt que de vider la carte sur cette zone prioritaire).
-const OPEN_DATA = DATA.filter(p=> p.categorie==='ouverte' || p.zone==='reunion' || p.zone==='mayotte');
-
 const state = {
   types:new Set(Object.keys(TYPE_META)),
+  query:'',
 };
 
+function matchesQuery(p){
+  if(!state.query) return true;
+  const hay = `${p.titre} ${p.employeur} ${p.lieu} ${p.pays||''} ${p.source||''}`.toLowerCase();
+  return state.query.split(/\s+/).filter(Boolean).every(term=>hay.includes(term));
+}
+
 function filteredPoints(){
-  return OPEN_DATA.filter(p=> state.types.has(p.type_contrat));
+  return DATA.filter(p=> state.types.has(p.type_contrat) && matchesQuery(p));
 }
 
 function renderStats(){
-  const total = OPEN_DATA.length;
-  const withDate = OPEN_DATA.filter(p=>p.date_detection);
+  const total = DATA.length;
+  const withDate = DATA.filter(p=>p.date_detection);
   const last = withDate.length ? withDate.reduce((a,b)=> parseFR(a.date_detection)>parseFR(b.date_detection)?a:b).date_detection : '—';
   const el = document.getElementById('stats');
   el.innerHTML = `
-    <div class="stat-chip"><div class="n">${total}</div><div class="l">Annonces affichées</div></div>
+    <div class="stat-chip"><div class="n">${total}</div><div class="l">Annonces en cours</div></div>
     <div class="stat-chip"><div class="n" style="font-size:14px">${last}</div><div class="l">Dernière annonce</div></div>
   `;
 }
 
 function renderTypeFilter(){
-  const pts = OPEN_DATA;
+  const pts = DATA.filter(matchesQuery);
   const el = document.getElementById('typeFilter');
   el.innerHTML = Object.keys(TYPE_META).map(k=>{
     const meta = TYPE_META[k];
@@ -291,15 +273,22 @@ function renderTypeFilter(){
   }));
 }
 
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+searchInput.addEventListener('input', ()=>{
+  state.query = searchInput.value.trim().toLowerCase();
+  searchClear.classList.toggle('show', !!state.query);
+  renderAll();
+});
+searchClear.addEventListener('click', ()=>{
+  searchInput.value=''; state.query=''; searchClear.classList.remove('show'); renderAll();
+});
+
 // ---------- Leaflet map ----------
 let map, cluster, osmLayer, satLayer, tileErrorCount = 0, boundsFitted = false;
-const markerByIdx = {};
 
 function initMap(){
   map = L.map('map', {minZoom:2, maxZoom:18, worldCopyJump:true});
-  // Fond "Plan" via Esri (service de tuiles gratuit, sans clé) plutôt que tile.openstreetmap.org
-  // (le serveur OSM officiel renvoie une erreur d'accès/403 pour ce type d'intégration tierce
-  // embarquée) ou CARTO (leurs tuiles raster anonymes exigent désormais une clé API).
   osmLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
     attribution:'Tiles &copy; Esri — Source: Esri, HERE, Garmin, FAO, NOAA, USGS, © OpenStreetMap contributors',
     maxZoom:19
@@ -341,12 +330,11 @@ function renderMap(){
   const pts = filteredPoints();
   pts.forEach(p=>{
     const idx = DATA.indexOf(p);
-    const meta = STATUS_META[p.categorie];
     const selected = state.selected===idx;
     const size = selected ? 16 : 12;
     const icon = L.divIcon({
       className:'',
-      html:`<div class="pt-dot" style="width:${size}px;height:${size}px;background:${resolveVar(meta.color)};${selected?'box-shadow:0 0 0 3px '+resolveVar('var(--ember)')+';':'box-shadow:0 0 0 2px '+resolveVar('var(--surface)')+';'}"></div>`,
+      html:`<div class="pt-dot" style="width:${size}px;height:${size}px;${selected?'box-shadow:0 0 0 3px '+resolveVar('var(--ember)')+';':''}"></div>`,
       iconSize:[size,size], iconAnchor:[size/2,size/2]
     });
     const m = L.marker([p.lat, p.lon], {icon});
@@ -354,7 +342,6 @@ function renderMap(){
       state.selected = idx;
       renderMap(); renderList(); openDetail(idx);
     });
-    markerByIdx[idx] = m;
     cluster.addLayer(m);
   });
 
@@ -371,10 +358,6 @@ function focusPoint(idx){
   map.setView([p.lat, p.lon], Math.max(map.getZoom(), 7), {animate:true});
 }
 
-function fmtStatut(p){
-  return p.statut && p.statut.trim() ? p.statut : "Repérée avant la mise en place du suivi détaillé — statut non tracé finement.";
-}
-
 function renderList(){
   const pts = filteredPoints();
   document.getElementById('listCount').textContent = pts.length + (pts.length>1?' annonces':' annonce');
@@ -385,10 +368,9 @@ function renderList(){
   }
   el.innerHTML = pts.map(p=>{
     const idx = DATA.indexOf(p);
-    const meta = STATUS_META[p.categorie];
     const sel = state.selected===idx?' selected':'';
     return `<div class="list-item${sel}" data-idx="${idx}">
-      <span class="sw" style="background:${resolveVar(meta.color)}"></span>
+      <span class="sw"></span>
       <div class="body">
         <div class="t">${p.titre}</div>
         <div class="m">${p.employeur} · ${p.lieu} · ${(TYPE_META[p.type_contrat]||{}).label||''}${p.date_detection?' · '+p.date_detection:''}</div>
@@ -404,22 +386,18 @@ function renderList(){
 
 function openDetail(idx){
   const p = DATA[idx];
-  const meta = STATUS_META[p.categorie];
   const card = document.getElementById('detailCard');
   card.innerHTML = `
     <button class="close" id="closeDetail" aria-label="Fermer">✕</button>
     <h3>${p.titre}</h3>
     <div class="emp">${p.employeur}</div>
-    <span class="badge" style="background:${resolveVar(meta.soft)}; color:${resolveVar(meta.color)}">
-      <span class="dot" style="width:8px;height:8px;border-radius:50%;background:${resolveVar(meta.color)}"></span>${meta.label}
-    </span>
+    <span class="badge"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--open)"></span>En cours</span>
     <dl>
       <dt>Lieu</dt><dd>${p.lieu}</dd>
       <dt>Type</dt><dd>${(TYPE_META[p.type_contrat]||{}).label||'—'}${p.contrat && p.contrat!=="Appel d'offre" ? ' · '+p.contrat : ''}</dd>
       <dt>Source</dt><dd>${p.source||'—'}</dd>
       <dt>Publiée le</dt><dd>${p.date_detection||'date inconnue'}</dd>
     </dl>
-    <div class="statut-txt">${fmtStatut(p)}</div>
     ${p.url ? `<a class="btn-link" href="${p.url}" target="_blank" rel="noopener">Voir l'annonce →</a>` : `<span class="no-link">Pas de lien direct enregistré pour cette annonce.</span>`}
   `;
   document.getElementById('closeDetail').addEventListener('click', closeDetail);
