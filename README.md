@@ -29,11 +29,12 @@ France (métropole et DOM-TOM) et à l'international. Mise à jour chaque jour.
 
 ## Sources
 
-France Travail, LinkedIn, Hellowork, Apec, Cadremploi, Glassdoor, Indeed, Jobijoba,
-Emploi-territorial, Emploi-environnement, GeoRezo, BOAMP (appels d'offres), Civiweb (VIE/VIA),
-CGF Tahiti et portails locaux pour la Polynésie et la Nouvelle-Calédonie, ainsi que des sites
-belges, suisses et luxembourgeois. Certains sites (Jooble, parfois Glassdoor et Indeed
-Belgique) bloquent l'accès automatisé et ne sont donc pas couverts en continu.
+France Travail, LinkedIn, Hellowork, Apec, Cadremploi, Glassdoor, Indeed (France et Belgique),
+Jobijoba, Emploi-territorial, Emploi-environnement, GeoRezo, BOAMP et Banque mondiale (appels
+d'offres), Civiweb (VIE/VIA), CGF Tahiti (Polynésie française) et geomatik.ch (Suisse).
+La Nouvelle-Calédonie et la Polynésie sont aussi recherchées, mais très peu d'annonces y sont
+publiées. Certains sites (Jooble, parfois Glassdoor et Indeed Belgique) bloquent l'accès
+automatisé et ne sont donc pas couverts en continu.
 
 ## Pile technique
 
