@@ -1,0 +1,276 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sources — Radar Emploi SIG &amp; Géomatique</title>
+<meta name="description" content="Répartition des annonces cartographie / SIG / géomatique par site source, limites connues de chaque site et note sur les doublons.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F4F7FB;
+  --surface:#FFFFFF;
+  --surface-2:#EAF0F7;
+  --text:#14213D;
+  --text-muted:#5B6780;
+  --border:#D6DFEA;
+  --accent:#2E6DA4;
+  --accent-ink:#1B4F7C;
+  --accent-soft:#DCEAF7;
+  --ember:#E8812F;
+  --ember-soft:#FCEBDA;
+  --navy:#14213D;
+  --shadow: 0 1px 2px rgba(20,33,61,.06), 0 8px 24px -12px rgba(20,33,61,.20);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1626; --surface:#16213A; --surface-2:#1C2A48; --text:#E8EEF8;
+    --text-muted:#9FB0CC; --border:#2C3D60; --accent:#5AA0DD; --accent-ink:#BBD9F3;
+    --accent-soft:#1E3556; --ember:#F09A55; --ember-soft:#3A2A1A; --navy:#E8EEF8;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.55);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1626; --surface:#16213A; --surface-2:#1C2A48; --text:#E8EEF8;
+  --text-muted:#9FB0CC; --border:#2C3D60; --accent:#5AA0DD; --accent-ink:#BBD9F3;
+  --accent-soft:#1E3556; --ember:#F09A55; --ember-soft:#3A2A1A; --navy:#E8EEF8;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.55);
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+body{
+  background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif;
+  padding-inline:16px; padding-block:0 40px; max-width:1080px; margin:0 auto;
+}
+h1,h2,h3{font-family:'Montserrat','IBM Plex Sans',system-ui,sans-serif; margin:0; text-wrap:balance;}
+a{color:var(--accent-ink);}
+
+.brand-banner{margin:0 -16px 0; height:clamp(78px,14vw,140px); overflow:hidden; background:#fff; border-bottom:4px solid transparent;
+  border-image:linear-gradient(90deg,var(--accent) 0 50%,var(--ember) 50% 100%) 1;}
+.brand-banner img{display:block; width:100%; height:100%; object-fit:cover; object-position:center;}
+
+header.top{margin:20px 0 6px;}
+header.top .back{font-size:13px; color:var(--text-muted); text-decoration:none; display:inline-block; margin-bottom:10px;}
+header.top .back:hover{color:var(--accent-ink);}
+header.top h1{font-size:clamp(22px,3.6vw,30px); font-weight:800; color:var(--navy); letter-spacing:-.01em;}
+header.top .lead{margin:8px 0 0; color:var(--text); font-size:14.5px; line-height:1.55; max-width:74ch;}
+header.top .meta{margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-muted);}
+
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); padding:20px; margin-top:18px;}
+.panel h2{font-size:17px; margin-bottom:12px; color:var(--navy);}
+.panel p{font-size:13.5px; line-height:1.6; color:var(--text); margin:0 0 10px;}
+.panel p.muted{color:var(--text-muted); font-size:12.5px;}
+
+.chart-row{display:flex; flex-wrap:wrap; gap:28px; align-items:center; justify-content:center;}
+.pie{
+  width:min(280px,60vw); height:min(280px,60vw); border-radius:50%; flex:0 0 auto;
+  background: conic-gradient(var(--pie-stops));
+  box-shadow: inset 0 0 0 1px var(--border), var(--shadow);
+  position:relative;
+}
+.pie::after{
+  content:''; position:absolute; inset:22%; border-radius:50%; background:var(--surface);
+  display:flex; box-shadow: inset 0 0 0 1px var(--border);
+}
+.pie-total{
+  position:absolute; inset:22%; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-family:'IBM Plex Mono',monospace; text-align:center; pointer-events:none;
+}
+.pie-total .n{font-size:26px; font-weight:600; color:var(--accent-ink);}
+.pie-total .l{font-size:10px; letter-spacing:.04em; text-transform:uppercase; color:var(--text-muted); margin-top:2px;}
+
+.legend{display:flex; flex-direction:column; gap:7px; min-width:260px;}
+.legend .row{display:flex; align-items:center; gap:9px; font-size:13px;}
+.legend .sw{width:11px; height:11px; border-radius:3px; flex:0 0 auto;}
+.legend .name{flex:1; min-width:0;}
+.legend .n{font-family:'IBM Plex Mono',monospace; color:var(--text-muted); font-size:12px;}
+.legend .pct{font-family:'IBM Plex Mono',monospace; color:var(--accent-ink); font-weight:600; font-size:12.5px; min-width:44px; text-align:right;}
+
+table.detail{width:100%; border-collapse:collapse; margin-top:6px; font-size:13px;}
+table.detail th, table.detail td{text-align:left; padding:7px 10px; border-bottom:1px solid var(--border);}
+table.detail th{font-size:11px; letter-spacing:.03em; text-transform:uppercase; color:var(--text-muted); font-weight:600;}
+table.detail td.n{font-family:'IBM Plex Mono',monospace; text-align:right; color:var(--text);}
+table.detail tr:last-child td{border-bottom:none;}
+
+ul.limits{margin:0; padding-left:20px; font-size:13.5px; line-height:1.65; color:var(--text);}
+ul.limits li{margin-bottom:8px;}
+ul.limits b{color:var(--navy);}
+.badge{display:inline-block; font-size:10.5px; font-weight:600; letter-spacing:.03em; text-transform:uppercase;
+  padding:2px 7px; border-radius:999px; margin-right:6px; vertical-align:middle;}
+.badge.blocked{background:#FBDCDC; color:#9E2A2A;}
+.badge.partial{background:var(--ember-soft); color:#9A5A18;}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .badge.blocked{background:#4A1F1F; color:#F3A6A6;}
+  :root:not([data-theme="light"]) .badge.partial{background:#3A2A1A; color:#F0C48A;}
+}
+:root[data-theme="dark"] .badge.blocked{background:#4A1F1F; color:#F3A6A6;}
+:root[data-theme="dark"] .badge.partial{background:#3A2A1A; color:#F0C48A;}
+
+footer{margin-top:26px; padding-top:14px; font-size:12px; color:var(--text-muted); text-align:center; border-top:4px solid transparent;
+  border-image:linear-gradient(90deg,var(--accent) 0 50%,var(--ember) 50% 100%) 1;}
+footer a{color:var(--accent-ink); font-weight:600;}
+</style>
+
+<div class="brand-banner"><img src="assets/geomark-banner.jpg" alt="Geomark Solutions SIG" width="1632" height="321"></div>
+
+<header class="top">
+  <a class="back" href="index.html">← Retour à la carte</a>
+  <h1>D'où viennent les annonces ?</h1>
+  <p class="lead">Répartition des annonces cartographie / SIG / géomatique actuellement en cours par site source, avec les limites d'accès connues et une note sur les doublons entre sites.</p>
+  <p class="meta" id="metaLine"></p>
+</header>
+
+<div class="panel">
+  <h2>Répartition par source</h2>
+  <div class="chart-row">
+    <div class="pie" id="pie">
+      <div class="pie-total"><div class="n" id="pieTotal"></div><div class="l">annonces</div></div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <p class="muted" id="autresDetail" style="margin-top:16px;"></p>
+</div>
+
+<div class="panel">
+  <h2>Doublons entre sites</h2>
+  <p>Une annonce n'est ajoutée que si son intitulé, son employeur et sa commune ne correspondent à
+  aucune annonce déjà suivie. Ce contrôle fonctionne bien <b>à l'intérieur d'un même site</b>, mais
+  reste imparfait <b>entre sites</b> : les agrégateurs comme Jobijoba republient très largement des
+  offres déjà présentes sur Hellowork, parfois sous un intitulé légèrement différent ; à l'inverse,
+  une même entreprise (ex. Egis) peut publier une annonce très proche pour plusieurs villes, qui sont
+  alors des postes réellement distincts et non des doublons.</p>
+  <p class="muted">Les chiffres ci-dessus comptent donc des <b>annonces publiées</b>, pas des
+  <b>postes uniques</b> : le nombre réel de postes distincts est probablement un peu inférieur.</p>
+</div>
+
+<div class="panel">
+  <h2>Limites connues par site</h2>
+  <ul class="limits">
+    <li><span class="badge blocked">Bloqué</span><b>Jooble</b> — vérification anti-robot (Cloudflare) jamais franchie : aucune annonce n'en provient.</li>
+    <li><span class="badge blocked">Bloqué</span><b>Indeed Belgique</b> — contrôle de sécurité systématique, y compris via navigateur ; les annonces belges affichées datent d'un accès antérieur et ne sont plus revérifiées de façon fiable.</li>
+    <li><span class="badge partial">Accès limité</span><b>Indeed France, Cadremploi, Apec</b> — inaccessibles en téléchargement direct (erreur 401/403) ; ne se lisent qu'en ouvrant chaque fiche dans un navigateur, ce qui limite le volume traité.</li>
+    <li><span class="badge partial">Accès limité</span><b>Glassdoor</b> — la vérification anti-robot apparaît par intermittence, y compris sur une simple fiche déjà en liste.</li>
+    <li><span class="badge partial">Accès limité</span><b>LinkedIn</b> — recherche anonyme plafonnée à ~60 résultats par mot-clé ; le bouton « Postuler » n'expose jamais la plateforme externe sans connexion, d'où des fiches parfois sans contrat ni salaire.</li>
+    <li><span class="badge blocked">Fermé</span><b>Welcome to the Jungle</b> — la recherche par mot-clé sans compte a été retirée du site.</li>
+    <li><b>GeoRezo</b> — seule source où la fraîcheur est garantie par construction : le forum n'affiche que des sujets encore actifs.</li>
+  </ul>
+</div>
+
+<footer>Radar Emploi — maintenu par <a href="https://github.com/GeomarkSIG">Geomark Solutions SIG</a>. Page générée automatiquement à partir des mêmes données que la carte.</footer>
+
+<script>
+const STATS = {
+ "derniere_maj": "2026-09-28",
+ "total": 311,
+ "slices": [
+  {
+   "source": "France Travail",
+   "count": 121,
+   "pct": 38.9
+  },
+  {
+   "source": "LinkedIn",
+   "count": 40,
+   "pct": 12.9
+  },
+  {
+   "source": "Hellowork",
+   "count": 36,
+   "pct": 11.6
+  },
+  {
+   "source": "GeoRezo",
+   "count": 35,
+   "pct": 11.3
+  },
+  {
+   "source": "Emploi-territorial",
+   "count": 35,
+   "pct": 11.3
+  },
+  {
+   "source": "BOAMP (appels d'offres)",
+   "count": 9,
+   "pct": 2.9
+  },
+  {
+   "source": "Apec",
+   "count": 9,
+   "pct": 2.9
+  },
+  {
+   "source": "Indeed (FR+BE)",
+   "count": 6,
+   "pct": 1.9
+  },
+  {
+   "source": "Glassdoor",
+   "count": 6,
+   "pct": 1.9
+  },
+  {
+   "source": "Jobijoba",
+   "count": 5,
+   "pct": 1.6
+  },
+  {
+   "source": "Autres (6 sites)",
+   "count": 9,
+   "pct": 2.9,
+   "detail": [
+    {
+     "source": "Cadremploi",
+     "count": 2
+    },
+    {
+     "source": "geomatik.ch",
+     "count": 2
+    },
+    {
+     "source": "Emploi-environnement",
+     "count": 2
+    },
+    {
+     "source": "CGF Tahiti",
+     "count": 1
+    },
+    {
+     "source": "Civiweb (VIE/VIA)",
+     "count": 1
+    },
+    {
+     "source": "Banque mondiale (AO)",
+     "count": 1
+    }
+   ]
+  }
+ ]
+};
+const PALETTE = ['#2E6DA4','#E8812F','#7B5EA7','#1E8F6B','#C2578B','#C9A227','#2FA6A6','#8D5B2D','#7CB342','#4C6B8A','#9AA5B8'];
+
+document.getElementById('metaLine').textContent = `${STATS.total} annonces en cours · dernière mise à jour ${STATS.derniere_maj}`;
+document.getElementById('pieTotal').textContent = STATS.total;
+
+let acc = 0;
+const stops = STATS.slices.map((s, i) => {
+  const color = PALETTE[i % PALETTE.length];
+  const from = acc, to = acc + s.pct;
+  acc = to;
+  return `${color} ${from}% ${to}%`;
+}).join(', ');
+document.getElementById('pie').style.setProperty('--pie-stops', stops);
+
+document.getElementById('legend').innerHTML = STATS.slices.map((s, i) => `
+  <div class="row">
+    <span class="sw" style="background:${PALETTE[i % PALETTE.length]}"></span>
+    <span class="name">${s.source}</span>
+    <span class="n">${s.count}</span>
+    <span class="pct">${s.pct}%</span>
+  </div>`).join('');
+
+const autres = STATS.slices.find(s => s.detail);
+if (autres) {
+  document.getElementById('autresDetail').innerHTML =
+    `« ${autres.source} » regroupe, pour rester lisible : ` +
+    autres.detail.map(d => `${d.source} (${d.count})`).join(', ') + '.';
+}
+</script>
