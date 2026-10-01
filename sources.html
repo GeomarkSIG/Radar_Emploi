@@ -123,11 +123,12 @@ footer a{color:var(--accent-ink); font-weight:600;}
   <h2>Répartition par source</h2>
   <div class="chart-row">
     <div class="pie" id="pie">
-      <div class="pie-total"><div class="n" id="pieTotal"></div><div class="l">annonces</div></div>
+      <div class="pie-total"><div class="n" id="pieTotal"></div><div class="l" id="pieTotalLabel">annonces</div></div>
     </div>
     <div class="legend" id="legend"></div>
   </div>
-  <p class="muted" id="autresDetail" style="margin-top:16px;"></p>
+  <p class="muted" id="mentionsNote" style="margin-top:10px;"></p>
+  <p class="muted" id="autresDetail" style="margin-top:6px;"></p>
 </div>
 
 <div class="panel">
@@ -161,6 +162,7 @@ footer a{color:var(--accent-ink); font-weight:600;}
 const STATS = {
  "derniere_maj": "2026-10-01",
  "total": 491,
+ "total_mentions": 492,
  "slices": [
   {
    "source": "LinkedIn",
@@ -170,7 +172,7 @@ const STATS = {
   {
    "source": "France Travail",
    "count": 132,
-   "pct": 26.9
+   "pct": 26.8
   },
   {
    "source": "Hellowork",
@@ -180,12 +182,12 @@ const STATS = {
   {
    "source": "Emploi-territorial",
    "count": 42,
-   "pct": 8.6
+   "pct": 8.5
   },
   {
    "source": "GeoRezo",
-   "count": 32,
-   "pct": 6.5
+   "count": 33,
+   "pct": 6.7
   },
   {
    "source": "BOAMP (appels d'offres)",
@@ -259,7 +261,14 @@ const STATS = {
 const PALETTE = ['#2E6DA4','#E8812F','#7B5EA7','#1E8F6B','#C2578B','#C9A227','#2FA6A6','#8D5B2D','#7CB342','#4C6B8A','#9AA5B8'];
 
 document.getElementById('metaLine').textContent = `${STATS.total} annonces en cours · dernière mise à jour ${STATS.derniere_maj}`;
-document.getElementById('pieTotal').textContent = STATS.total;
+const totalMentions = STATS.total_mentions || STATS.total;
+document.getElementById('pieTotal').textContent = totalMentions;
+document.getElementById('pieTotalLabel').textContent = totalMentions === STATS.total ? 'annonces' : 'citations';
+if (totalMentions !== STATS.total) {
+  document.getElementById('mentionsNote').textContent =
+    `Une même annonce peut être repérée sur plusieurs sites (fiche détaillée avec tous les liens) ; ` +
+    `le camembert compte alors chaque site qui la cite, d'où ${totalMentions} citations pour ${STATS.total} annonces.`;
+}
 
 let acc = 0;
 const stops = STATS.slices.map((s, i) => {
