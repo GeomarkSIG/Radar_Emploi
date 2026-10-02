@@ -150,9 +150,11 @@ footer a{color:var(--accent-ink); font-weight:600;}
     <li><span class="badge blocked">Bloqué</span><b>Indeed Belgique</b> — contrôle de sécurité systématique, y compris via navigateur ; les annonces belges affichées datent d'un accès antérieur et ne sont plus revérifiées de façon fiable.</li>
     <li><span class="badge partial">Accès limité</span><b>Indeed France, Cadremploi, Apec</b> — inaccessibles en téléchargement direct (erreur 401/403) ; ne se lisent qu'en ouvrant chaque fiche dans un navigateur, ce qui limite le volume traité.</li>
     <li><span class="badge partial">Accès limité</span><b>Glassdoor</b> — la vérification anti-robot apparaît par intermittence, y compris sur une simple fiche déjà en liste.</li>
-    <li><span class="badge partial">Accès limité</span><b>LinkedIn</b> — recherche anonyme plafonnée à ~60 résultats par mot-clé ; le bouton « Postuler » n'expose jamais la plateforme externe sans connexion, d'où des fiches parfois sans contrat ni salaire.</li>
+    <li><span class="badge partial">Accès limité</span><b>LinkedIn</b> — recherche anonyme plafonnée à ~60 résultats par mot-clé ; le bouton « Postuler » n'expose jamais la plateforme externe sans connexion, d'où des fiches parfois sans contrat ni salaire. Contrairement aux autres sources, une fiche LinkedIn reste intégralement affichée même après la clôture des candidatures (juste un bandeau discret) : toutes les annonces LinkedIn déjà suivies sont donc rouvertes à chaque mise à jour pour détecter ce bandeau (~11% s'avèrent fermées à chaque passage).</li>
     <li><span class="badge blocked">Fermé</span><b>Welcome to the Jungle</b> — la recherche par mot-clé sans compte a été retirée du site.</li>
+    <li><span class="badge blocked">Bloqué</span><b>Marchés Online, Vecteur Plus</b> (appels d'offres) — testés le 02/10/2026 : la recherche par mot-clé de Marchés Online renvoie systématiquement 0 résultat en accès libre (y compris pour des termes très courants), et le formulaire de Vecteur Plus ne se soumet pas sans connexion ; ces deux sites nécessitent un compte payant pour une recherche réelle.</li>
     <li><b>GeoRezo</b> — seule source où la fraîcheur est garantie par construction : le forum n'affiche que des sujets encore actifs.</li>
+    <li><span class="badge partial">Accès limité</span><b>simap.ch</b> — le filtre d'API par code CPV peut renvoyer des appels d'offres dont la date limite est déjà dépassée (le statut « tender » seul ne suffit pas) : chaque annonce candidate est revérifiée individuellement sur sa date de remise d'offre avant ajout.</li>
   </ul>
 </div>
 
@@ -160,14 +162,14 @@ footer a{color:var(--accent-ink); font-weight:600;}
 
 <script>
 const STATS = {
- "derniere_maj": "2026-10-01",
- "total": 475,
- "total_mentions": 476,
+ "derniere_maj": "2026-10-02",
+ "total": 474,
+ "total_mentions": 475,
  "slices": [
   {
    "source": "France Travail",
    "count": 132,
-   "pct": 27.7
+   "pct": 27.8
   },
   {
    "source": "LinkedIn",
@@ -192,7 +194,7 @@ const STATS = {
   {
    "source": "BOAMP (appels d'offres)",
    "count": 24,
-   "pct": 5.0
+   "pct": 5.1
   },
   {
    "source": "Jobijoba",
@@ -211,8 +213,8 @@ const STATS = {
   },
   {
    "source": "Autres (10 sites)",
-   "count": 21,
-   "pct": 4.4,
+   "count": 20,
+   "pct": 4.2,
    "detail": [
     {
      "source": "Indeed (FR+BE)",
@@ -223,15 +225,15 @@ const STATS = {
      "count": 3
     },
     {
-     "source": "simap.ch",
-     "count": 3
-    },
-    {
      "source": "geomatik.ch",
      "count": 2
     },
     {
      "source": "Emploi-environnement",
+     "count": 2
+    },
+    {
+     "source": "simap.ch",
      "count": 2
     },
     {
