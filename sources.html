@@ -105,6 +105,26 @@ ul.limits b{color:var(--navy);}
 :root[data-theme="dark"] .badge.blocked{background:#4A1F1F; color:#F3A6A6;}
 :root[data-theme="dark"] .badge.partial{background:#3A2A1A; color:#F0C48A;}
 
+/* ---- descriptif des sources ---- */
+.src-list{display:flex; flex-direction:column; gap:14px;}
+.src{border:1px solid var(--border); border-radius:12px; padding:14px 16px; background:var(--surface);}
+.src-h{display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px;}
+.src-h .sw{width:11px; height:11px; border-radius:3px; flex:0 0 auto;}
+.src-h .nm{font-family:'Montserrat','IBM Plex Sans',sans-serif; font-weight:700; font-size:15px; color:var(--navy);}
+.src-h .type{font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--text-muted); border:1px solid var(--border); border-radius:999px; padding:1px 8px;}
+.src-h .sp{flex:1 1 auto;}
+.src-h .n{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--text);}
+.src-h .pct{font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; color:var(--accent-ink); min-width:52px; text-align:right;}
+.src .bar{height:5px; border-radius:3px; background:var(--surface-2); margin:9px 0 10px; overflow:hidden;}
+.src .bar i{display:block; height:100%; border-radius:3px;}
+.src p{margin:0 0 6px; font-size:13.5px; line-height:1.55;}
+.src p.how{font-size:12.5px; color:var(--text-muted);}
+.src p.how b{color:var(--text);}
+.badge.ok{background:#DCF0E7; color:#17745A;}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .badge.ok{background:#1C3A2E; color:#7DD9B5;}
+}
+:root[data-theme="dark"] .badge.ok{background:#1C3A2E; color:#7DD9B5;}
 footer{margin-top:26px; padding-top:14px; font-size:12px; color:var(--text-muted); text-align:center; border-top:4px solid transparent;
   border-image:linear-gradient(90deg,var(--accent) 0 50%,var(--ember) 50% 100%) 1;}
 footer a{color:var(--accent-ink); font-weight:600;}
@@ -115,7 +135,7 @@ footer a{color:var(--accent-ink); font-weight:600;}
 <header class="top">
   <a class="back" href="index.html">← Retour à la carte</a>
   <h1>D'où viennent les annonces ?</h1>
-  <p class="lead">Répartition des annonces cartographie / SIG / géomatique actuellement en cours par site source, avec les limites d'accès connues et une note sur les doublons entre sites.</p>
+  <p class="lead">Répartition des annonces cartographie / SIG / géomatique actuellement en cours par site source, descriptif de chaque source (ce qu'elle apporte, comment elle est collectée, ses limites), traitement des doublons et des dates de publication.</p>
   <p class="meta" id="metaLine"></p>
 </header>
 
@@ -132,29 +152,39 @@ footer a{color:var(--accent-ink); font-weight:600;}
 </div>
 
 <div class="panel">
-  <h2>Doublons entre sites</h2>
-  <p>Une annonce n'est ajoutée que si son intitulé, son employeur et sa commune ne correspondent à
-  aucune annonce déjà suivie. Ce contrôle fonctionne bien <b>à l'intérieur d'un même site</b>, mais
-  reste imparfait <b>entre sites</b> : les agrégateurs comme Jobijoba republient très largement des
-  offres déjà présentes sur Hellowork, parfois sous un intitulé légèrement différent ; à l'inverse,
-  une même entreprise (ex. Egis) peut publier une annonce très proche pour plusieurs villes, qui sont
-  alors des postes réellement distincts et non des doublons.</p>
-  <p class="muted">Les chiffres ci-dessus comptent donc des <b>annonces publiées</b>, pas des
-  <b>postes uniques</b> : le nombre réel de postes distincts est probablement un peu inférieur.</p>
+  <h2>Descriptif des sources</h2>
+  <p class="muted" style="margin-bottom:14px;">Classées par nombre d'annonces citées. « Automatisé » : collecte et revérification quotidiennes par script ; « Ajout manuel » : relevé dans un navigateur, sans automatisation possible ; « Accès limité » et « Bloqué » : voir la mention de chaque source.</p>
+  <div class="src-list" id="srcList"></div>
 </div>
 
 <div class="panel">
-  <h2>Limites connues par site</h2>
+  <h2>Doublons entre sites</h2>
+  <p>Avant tout ajout, chaque annonce est comparée à toutes celles déjà suivies : intitulé, employeur et commune
+  proches (variantes d'écriture, arrondissements et « H/F » ignorés). Les <b>doublons certains</b> sont fusionnés :
+  une seule fiche sur la carte, qui garde le lien vers <b>chaque</b> site qui la publie. Les cas douteux restent
+  séparés, et une même entreprise peut publier des annonces très proches pour plusieurs villes, qui sont alors des
+  postes réellement distincts (par exemple Egis ou Magellium).</p>
+  <p class="muted">Le camembert compte une citation par site et par annonce : une offre publiée sur trois sites compte trois
+  fois dans la répartition mais une seule fois sur la carte. Les chiffres décrivent donc la contribution de chaque
+  source, pas un nombre de postes uniques, dont le total reste légèrement inférieur au nombre d'annonces.</p>
+</div>
+
+<div class="panel">
+  <h2>Dates de publication</h2>
+  <p>La date affichée pour chaque annonce est celle que le <b>site source</b> indique : date de mise en ligne
+  (Hellowork, LinkedIn, Jobijoba, jobup.ch…), « Publiée le » (emploi-territorial), premier message du sujet (GeoRezo),
+  date de parution de l'avis (BOAMP, TED, simap.ch, Banque mondiale). France Travail n'indique qu'un âge (« il y a 4 jours »),
+  converti en date ; au-delà d'un mois la date est alors approximative (« vers le »).</p>
+  <p class="muted" id="datesNote"></p>
+</div>
+
+<div class="panel">
+  <h2>Sources testées mais non exploitables</h2>
   <ul class="limits">
-    <li><span class="badge blocked">Bloqué</span><b>Jooble</b> — vérification anti-robot (Cloudflare) jamais franchie : aucune annonce n'en provient.</li>
-    <li><span class="badge blocked">Bloqué</span><b>Indeed Belgique</b> — contrôle de sécurité systématique, y compris via navigateur ; les annonces belges affichées datent d'un accès antérieur et ne sont plus revérifiées de façon fiable.</li>
-    <li><span class="badge partial">Accès limité</span><b>Indeed France, Cadremploi, Apec</b> — inaccessibles en téléchargement direct (erreur 401/403) ; ne se lisent qu'en ouvrant chaque fiche dans un navigateur, ce qui limite le volume traité.</li>
-    <li><span class="badge partial">Accès limité</span><b>Glassdoor</b> — la vérification anti-robot apparaît par intermittence, y compris sur une simple fiche déjà en liste.</li>
-    <li><span class="badge partial">Accès limité</span><b>LinkedIn</b> — recherche anonyme plafonnée à ~60 résultats par mot-clé ; le bouton « Postuler » n'expose jamais la plateforme externe sans connexion, d'où des fiches parfois sans contrat ni salaire. Contrairement aux autres sources, une fiche LinkedIn reste intégralement affichée même après la clôture des candidatures (juste un bandeau discret) : toutes les annonces LinkedIn déjà suivies sont donc rouvertes à chaque mise à jour pour détecter ce bandeau (~11% s'avèrent fermées à chaque passage).</li>
+    <li><span class="badge blocked">Bloqué</span><b>Jooble</b> — vérification anti-robot (Cloudflare) jamais franchie, même dans un navigateur : aucune annonce n'en provient.</li>
+    <li><span class="badge blocked">Bloqué</span><b>Marchés Online, Vecteur Plus</b> (appels d'offres) — la recherche par mot-clé de Marchés Online renvoie 0 résultat en accès libre et le formulaire de Vecteur Plus exige une connexion : ces deux sites nécessitent un compte payant.</li>
     <li><span class="badge blocked">Fermé</span><b>Welcome to the Jungle</b> — la recherche par mot-clé sans compte a été retirée du site.</li>
-    <li><span class="badge blocked">Bloqué</span><b>Marchés Online, Vecteur Plus</b> (appels d'offres) — testés le 02/10/2026 : la recherche par mot-clé de Marchés Online renvoie systématiquement 0 résultat en accès libre (y compris pour des termes très courants), et le formulaire de Vecteur Plus ne se soumet pas sans connexion ; ces deux sites nécessitent un compte payant pour une recherche réelle.</li>
-    <li><b>GeoRezo</b> — seule source où la fraîcheur est garantie par construction : le forum n'affiche que des sujets encore actifs.</li>
-    <li><span class="badge partial">Accès limité</span><b>simap.ch</b> — le filtre d'API par code CPV peut renvoyer des appels d'offres dont la date limite est déjà dépassée (le statut « tender » seul ne suffit pas) : chaque annonce candidate est revérifiée individuellement sur sa date de remise d'offre avant ajout.</li>
+    <li><span class="badge partial">Limité</span><b>Cadremploi</b> — fiches illisibles en téléchargement direct (403) et titre de page insuffisant pour savoir si une offre est fermée : aucune annonce Cadremploi n'est conservée à ce jour.</li>
   </ul>
 </div>
 
@@ -163,43 +193,44 @@ footer a{color:var(--accent-ink); font-weight:600;}
 <script>
 const STATS = {
  "derniere_maj": "2026-10-23",
- "total": 727,
- "total_mentions": 884,
+ "total": 722,
+ "total_mentions": 876,
+ "avec_date_publication": 689,
  "slices": [
   {
    "source": "LinkedIn",
    "count": 185,
-   "pct": 20.9
+   "pct": 21.1
   },
   {
    "source": "France Travail",
    "count": 155,
-   "pct": 17.5
+   "pct": 17.7
   },
   {
    "source": "Hellowork",
-   "count": 151,
+   "count": 150,
    "pct": 17.1
   },
   {
    "source": "Jobijoba",
-   "count": 142,
-   "pct": 16.1
+   "count": 140,
+   "pct": 16.0
   },
   {
    "source": "Emploi-territorial",
    "count": 63,
-   "pct": 7.1
+   "pct": 7.2
   },
   {
    "source": "GeoRezo",
    "count": 47,
-   "pct": 5.3
+   "pct": 5.4
   },
   {
-   "source": "ted.europa.eu",
+   "source": "TED (AO européens)",
    "count": 39,
-   "pct": 4.4
+   "pct": 4.5
   },
   {
    "source": "Banque mondiale (AO)",
@@ -212,18 +243,17 @@ const STATS = {
    "pct": 2.5
   },
   {
-   "source": "Apec",
-   "count": 14,
-   "pct": 1.6
-  },
-  {
-   "source": "Autres (8 sites)",
-   "count": 36,
-   "pct": 4.1,
+   "source": "Autres (9 sites)",
+   "count": 45,
+   "pct": 5.1,
    "detail": [
     {
-     "source": "simap.ch",
+     "source": "simap.ch (AO suisses)",
      "count": 12
+    },
+    {
+     "source": "Apec",
+     "count": 9
     },
     {
      "source": "Glassdoor",
@@ -250,10 +280,120 @@ const STATS = {
      "count": 2
     },
     {
-     "source": "emploi.metropole.nantes.fr",
+     "source": "Nantes Métropole (emploi)",
      "count": 1
     }
    ]
+  }
+ ],
+ "sources": [
+  {
+   "key": "linkedin.com",
+   "source": "LinkedIn",
+   "count": 185,
+   "pct": 21.1
+  },
+  {
+   "key": "francetravail.fr",
+   "source": "France Travail",
+   "count": 155,
+   "pct": 17.7
+  },
+  {
+   "key": "hellowork.com",
+   "source": "Hellowork",
+   "count": 150,
+   "pct": 17.1
+  },
+  {
+   "key": "jobijoba.com",
+   "source": "Jobijoba",
+   "count": 140,
+   "pct": 16.0
+  },
+  {
+   "key": "emploi-territorial.fr",
+   "source": "Emploi-territorial",
+   "count": 63,
+   "pct": 7.2
+  },
+  {
+   "key": "georezo.net",
+   "source": "GeoRezo",
+   "count": 47,
+   "pct": 5.4
+  },
+  {
+   "key": "ted.europa.eu",
+   "source": "TED (AO européens)",
+   "count": 39,
+   "pct": 4.5
+  },
+  {
+   "key": "projects.worldbank.org",
+   "source": "Banque mondiale (AO)",
+   "count": 30,
+   "pct": 3.4
+  },
+  {
+   "key": "boamp.fr",
+   "source": "BOAMP (appels d'offres)",
+   "count": 22,
+   "pct": 2.5
+  },
+  {
+   "key": "simap.ch",
+   "source": "simap.ch (AO suisses)",
+   "count": 12,
+   "pct": 1.4
+  },
+  {
+   "key": "apec.fr",
+   "source": "Apec",
+   "count": 9,
+   "pct": 1.0
+  },
+  {
+   "key": "glassdoor.fr",
+   "source": "Glassdoor",
+   "count": 7,
+   "pct": 0.8
+  },
+  {
+   "key": "emploi-environnement.com",
+   "source": "Emploi-environnement",
+   "count": 6,
+   "pct": 0.7
+  },
+  {
+   "key": "Indeed (FR+BE)",
+   "source": "Indeed (FR+BE)",
+   "count": 3,
+   "pct": 0.3
+  },
+  {
+   "key": "jobup.ch",
+   "source": "jobup.ch",
+   "count": 3,
+   "pct": 0.3
+  },
+  {
+   "key": "mon-vie-via.businessfrance.fr",
+   "source": "Civiweb (VIE/VIA)",
+   "count": 2,
+   "pct": 0.2
+  },
+  {
+   "key": "geomatik.ch",
+   "source": "geomatik.ch",
+   "count": 2,
+   "pct": 0.2
+  },
+  {
+   "key": "emploi.metropole.nantes.fr",
+   "source": "Nantes Métropole (emploi)",
+   "count": 1,
+   "pct": 0.1
   }
  ]
 };
@@ -278,12 +418,13 @@ const stops = STATS.slices.map((s, i) => {
 }).join(', ');
 document.getElementById('pie').style.setProperty('--pie-stops', stops);
 
+const fmtPct = v => Number(v).toLocaleString('fr-FR', {maximumFractionDigits: 1}) + ' %';
 document.getElementById('legend').innerHTML = STATS.slices.map((s, i) => `
   <div class="row">
     <span class="sw" style="background:${PALETTE[i % PALETTE.length]}"></span>
     <span class="name">${s.source}</span>
     <span class="n">${s.count}</span>
-    <span class="pct">${s.pct}%</span>
+    <span class="pct">${fmtPct(s.pct)}</span>
   </div>`).join('');
 
 const autres = STATS.slices.find(s => s.detail);
@@ -291,5 +432,108 @@ if (autres) {
   document.getElementById('autresDetail').innerHTML =
     `« ${autres.source} » regroupe, pour rester lisible : ` +
     autres.detail.map(d => `${d.source} (${d.count})`).join(', ') + '.';
+}
+
+// ---------- descriptif de chaque source ----------
+const STATUS = {
+  auto:    ['Automatisé', 'ok'],
+  partial: ['Accès limité', 'partial'],
+  manual:  ['Ajout manuel', 'partial'],
+  blocked: ['Bloqué', 'blocked'],
+};
+const INDEED = {type:'Emploi', st:'blocked',
+  desc:"Annonces historiques conservées sur la carte (France et Belgique regroupées).",
+  how:"Indeed est bloqué par Cloudflare, même dans le navigateur intégré : les annonces ne peuvent plus être revérifiées, et sont retirées dès qu'elles sont signalées fermées."};
+const SRC = {
+  'francetravail.fr': {type:'Emploi', st:'auto',
+    desc:"Service public de l'emploi : le plus gros volume d'offres en France (DOM-TOM compris), y compris les offres relayées par les agences d'intérim et cabinets partenaires.",
+    how:"Recherche par mots-clés (géomaticien, cartographe, SIG, QGIS, télédétection…) et par région, 150 résultats par appel. Une offre retirée renvoie une erreur 404 : la fermeture est détectée automatiquement."},
+  'linkedin.com': {type:'Emploi', st:'partial',
+    desc:"Offres de cabinets de conseil, ESN, bureaux d'études, collectivités et grandes entreprises, avec une forte présence en Belgique, Suisse, Luxembourg et Canada.",
+    how:"Interface publique d'offres, sans connexion, pays par pays (France, Belgique, Suisse, Luxembourg, Canada), environ 60 résultats maximum par recherche. Le bouton « Postuler » n'indique pas la plateforme d'origine, d'où des fiches sans contrat ni salaire. Une fiche reste affichée après la clôture : toutes les annonces LinkedIn suivies sont donc rouvertes à chaque mise à jour pour détecter le bandeau de clôture."},
+  'hellowork.com': {type:'Emploi', st:'auto',
+    desc:"Site d'emploi généraliste français : beaucoup d'offres d'entreprises, d'intérim et de cabinets, salaire souvent renseigné.",
+    how:"Dix mots-clés sur deux pages de résultats. Une offre fermée affiche « n'est plus disponible » et est retirée."},
+  'jobijoba.com': {type:'Emploi', st:'auto',
+    desc:"Agrégateur d'offres (groupe Hellowork) : republie des annonces d'autres sites et en apporte quelques-unes absentes ailleurs. La date est celle de la mise en ligne sur Jobijoba.",
+    how:"Recherche par mots-clés, données structurées de chaque fiche. Une annonce expirée renvoie une erreur 410. Source la plus exposée aux doublons avec Hellowork et France Travail."},
+  'emploi-territorial.fr': {type:'Emploi public', st:'auto',
+    desc:"Offres de la fonction publique territoriale : mairies, métropoles, départements, régions, SDIS, syndicats d'eau. Seule source pour beaucoup de postes de collectivités, DOM-TOM compris. L'ancien nom du site est Cap Territorial.",
+    how:"Recherche par mots-clés ; commune et date limite de candidature lues sur chaque fiche. Une annonce dont la date limite est dépassée est retirée."},
+  'georezo.net': {type:'Emploi / stage', st:'auto',
+    desc:"Forum Job de la communauté francophone de la géomatique : offres ciblées SIG (collectivités, bureaux d'études, recherche, stages, alternances, thèses). Seule source dont la fraîcheur est garantie par construction : le forum n'affiche que des sujets encore actifs.",
+    how:"Forum relu en entier à chaque passage ; les sujets déjà jugés hors sujet ne sont jamais rejugés. Certains sujets ne sont lisibles qu'après identification et ne peuvent pas être revérifiés."},
+  'emploi-environnement.com': {type:'Emploi', st:'auto',
+    desc:"Site d'offres du secteur de l'environnement : bureaux d'études, eau, collectivités. Beaucoup de postes SIG chez Saur, Egis, Antea ou Socotec.",
+    how:"Huit mots-clés sur deux pages. La recherche est très large (plein texte) : seuls les intitulés à vrai volet géospatial sont retenus. Le texte du corps de page est lu pour détecter une offre expirée."},
+  'apec.fr': {type:'Emploi cadres', st:'manual',
+    desc:"Offres destinées aux cadres : chefs de projet SIG, développeurs, responsables de données géographiques.",
+    how:"L'interface de recherche n'est accessible que dans un navigateur : les annonces sont relevées à la main (recherche SIG, géomatique, cartographe), avec contrat, salaire et date lus sur la fiche."},
+  'glassdoor.fr': {type:'Emploi', st:'blocked',
+    desc:"Annonces historiques conservées sur la carte.",
+    how:"Glassdoor répond « réservé aux humains » (anti-robot) : les fiches ne peuvent plus être revérifiées automatiquement ni leur date relevée."},
+  'indeed.com': INDEED,
+  'indeed.be': INDEED,
+  'Indeed (FR+BE)': INDEED,
+  'boamp.fr': {type:"Appels d'offres", st:'auto',
+    desc:"Bulletin officiel des annonces de marchés publics (France) : appels d'offres de cartographie, SIG, orthophotographie, LiDAR, PCRS, logiciels SIG.",
+    how:"Interrogation de l'API ouverte avec les codes CPV géospatiaux (la recherche par mot-clé « SIG » ramène surtout de la signalisation routière). La date limite de réponse est vérifiée ; un avis échu est retiré."},
+  'ted.europa.eu': {type:"Appels d'offres", st:'auto',
+    desc:"Journal officiel de l'Union européenne : marchés publics au-dessus des seuils européens, dans toute l'Europe, avec focalisation France, Belgique, Luxembourg et Suisse.",
+    how:"API publique, filtrée sur les codes CPV géospatiaux et sur les avis dont la date limite n'est pas dépassée."},
+  'simap.ch': {type:"Appels d'offres", st:'partial',
+    desc:"Plateforme suisse des marchés publics : appels d'offres de géomatique, mensuration et SIG des communes, cantons et de la Confédération.",
+    how:"API filtrée par code CPV. Elle peut renvoyer des appels d'offres échus : chaque annonce candidate est revérifiée sur sa date de remise d'offre avant d'être ajoutée."},
+  'projects.worldbank.org': {type:"Appels d'offres", st:'auto',
+    desc:"Appels d'offres de la Banque mondiale pour des projets de développement dans le monde entier (SIG, géospatial, cartographie, télédétection, cadastre).",
+    how:"API publique, sept mots-clés anglais ; les avis dont la date limite est dépassée sont écartés."},
+  'geomatik.ch': {type:'Emploi', st:'manual',
+    desc:"Association suisse des professionnels de la géomatique : offres, souvent en allemand, de bureaux d'ingénieurs-géomètres, cantons et villes.",
+    how:"Offres publiées en PDF, relevées à la main depuis la page des offres d'emploi ; la date est celle de mise en ligne du fichier."},
+  'jobup.ch': {type:'Emploi', st:'manual',
+    desc:"Plateforme d'emploi de Suisse romande (groupe jobs.ch) : offres de géomaticien, apprentissages, missions.",
+    how:"Relevé à la main depuis le navigateur ; la date est lue dans les données structurées de la fiche."},
+  'mon-vie-via.businessfrance.fr': {type:'Volontariat', st:'manual',
+    desc:"Civiweb : volontariats internationaux en entreprise (VIE) ou en administration (VIA) liés à la géomatique ou à la géographie.",
+    how:"Le catalogue n'est accessible que dans un navigateur ; les annonces sont relevées à la main, avec la date de mise en ligne lue sur la fiche."},
+  'lagazettedescommunes.com': {type:'Emploi public', st:'auto',
+    desc:"Sélection d'offres de la Gazette des Communes, hébergées sur emploipublic.fr (collectivités et établissements publics).",
+    how:"Recherche par formulaire en texte intégral : le tri des annonces hors sujet se fait sur l'intitulé."},
+  'afigeo.asso.fr': {type:'Emploi', st:'auto',
+    desc:"Association française pour l'information géographique : rubrique « Opportunités » (offres de ses adhérents, écosystème géonumérique).",
+    how:"Actualités de la catégorie Opportunités, filtrées sur des mots de recrutement ; très peu de volume (0 à 1 offre par semaine)."},
+  'emploi.metropole.nantes.fr': {type:'Emploi public', st:'manual',
+    desc:"Site carrières de Nantes Métropole : annonce relevée directement chez l'employeur.",
+    how:"Ajout manuel ; la page ne publie pas de date de mise en ligne."},
+  'cgf.pf': {type:'Emploi public', st:'manual',
+    desc:"Centre de gestion et de formation de la fonction publique communale de Polynésie française : avis de recrutement.",
+    how:"Relevé à la main (un PDF par offre) ; très peu d'annonces géospatiales."},
+};
+const GENERIC = {type:'Emploi', st:'auto', desc:"Source récente : descriptif en cours de rédaction.", how:"Collectée par la routine quotidienne."};
+
+const maxPct = Math.max(...STATS.sources.map(s => s.pct), 1);
+document.getElementById('srcList').innerHTML = STATS.sources.map(s => {
+  const d = SRC[s.key] || GENERIC;
+  const [stLabel, stClass] = STATUS[d.st];
+  const si = STATS.slices.findIndex(x => x.source === s.source);
+  const color = PALETTE[(si >= 0 ? si : STATS.slices.length - 1) % PALETTE.length];
+  return `<div class="src">
+    <div class="src-h">
+      <span class="sw" style="background:${color}"></span><span class="nm">${s.source}</span>
+      <span class="type">${d.type}</span><span class="badge ${stClass}" style="margin:0">${stLabel}</span>
+      <span class="sp"></span><span class="n">${s.count} ${s.count > 1 ? 'citations' : 'citation'}</span><span class="pct">${fmtPct(s.pct)}</span>
+    </div>
+    <div class="bar"><i style="width:${(100 * s.pct / maxPct).toFixed(1)}%; background:${color}"></i></div>
+    <p>${d.desc}</p>
+    <p class="how"><b>Collecte :</b> ${d.how}</p>
+  </div>`;
+}).join('');
+
+if (STATS.avec_date_publication != null) {
+  const pc = Math.round(100 * STATS.avec_date_publication / STATS.total);
+  document.getElementById('datesNote').textContent =
+    `Date de publication connue pour ${STATS.avec_date_publication} annonces sur ${STATS.total} (${pc} %). ` +
+    `Elle est absente quand le site ne la communique pas ou ne peut pas être lu (Indeed et Glassdoor bloqués, sujets GeoRezo réservés aux membres) : ` +
+    `la carte affiche alors « date de publication inconnue ».`;
 }
 </script>

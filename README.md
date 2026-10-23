@@ -11,7 +11,7 @@ France (métropole et DOM-TOM) et à l'international. Mise à jour chaque jour.
 1. Cliquez un **point numéroté** pour déplier les annonces d'un même lieu. Il reste déplié
    tant que vous ne cliquez pas un autre point numéroté, ne dézoomez pas ou ne changez pas de filtre.
 2. Cliquez une annonce pour ouvrir sa fiche : intitulé, employeur, commune, type de contrat,
-   salaire quand il est indiqué, source, date de repérage et **lien direct vers l'annonce**.
+   salaire quand il est indiqué, source, **date de publication affichée par le site source**, date de dernière vérification et **lien direct vers l'annonce**.
 3. **Filtrez par type de contrat** (boutons *Tout cocher* / *Tout décocher*) ou **cherchez un
    mot-clé** (intitulé, employeur, ville, pays, source).
 4. Basculez entre fond *Plan* et *Satellite*.
@@ -45,6 +45,7 @@ Page statique unique (`index.html`), sans serveur ni base de données :
 - Fonds de carte [Esri](https://www.esri.com/) (plan et imagerie), données de base
   [OpenStreetMap](https://www.openstreetmap.org/copyright).
 - Données embarquées dans la page ; polices Montserrat et IBM Plex (Google Fonts).
+- Compteur de visiteurs : service public [Abacus](https://abacus.jasoncameron.dev), sans compte ni cookie ; un navigateur n'est compté qu'une fois (repère local).
 - Dossier `assets/` : logo et bandeau Geomark Solutions SIG.
 
 ## Mise à jour
