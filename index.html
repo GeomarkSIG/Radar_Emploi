@@ -49,17 +49,17 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:'IBM Plex Sans',system-ui,sans-serif;
-  padding-inline:16px;
-  padding-block:20px 40px;
-  max-width:1180px;
-  margin:0 auto;
+  margin:0;
 }
+/* Le bandeau Geomark occupe toute la largeur de l'écran ; le contenu reste centré dans une colonne large,
+   sans grandes bandes vides de part et d'autre sur les grands écrans. */
+.page{max-width:1480px; margin:0 auto; padding:0 16px 40px;}
 h1,h2,h3{font-family:'Montserrat','IBM Plex Sans',system-ui,sans-serif; margin:0; text-wrap:balance;}
 ::selection{background:var(--accent-soft);}
 a{color:var(--accent-ink);}
 
 /* ---- Charte Geomark : bandeau rubans bleu/orange + logo ---- */
-.brand-banner{margin:-20px -16px 0; height:clamp(92px,17vw,170px); overflow:hidden; background:#fff; border-bottom:4px solid transparent;
+.brand-banner{margin:0; height:clamp(92px,17vw,170px); overflow:hidden; background:#fff; border-bottom:4px solid transparent;
   border-image:linear-gradient(90deg,var(--accent) 0 50%,var(--ember) 50% 100%) 1;}
 .brand-banner img{display:block; width:100%; height:100%; object-fit:cover; object-position:center;}
 header.top{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px; margin:22px 0 14px;}
@@ -198,6 +198,7 @@ footer a{color:var(--accent-ink); font-weight:600;}
 
 <div class="brand-banner"><img src="assets/geomark-banner.jpg" alt="Geomark Solutions SIG" width="1632" height="321"></div>
 
+<div class="page">
 <header class="top">
   <div class="titles">
     <h1>Radar Emploi <span class="hl">SIG &amp; Géomatique</span></h1>
@@ -267,6 +268,8 @@ footer a{color:var(--accent-ink); font-weight:600;}
 </div>
 
 <footer>Radar Emploi — maintenu par <a href="https://geomark-sig.fr">Geomark Solutions SIG</a>. Données issues d'une veille quotidienne automatisée sur des sites d'emploi et portails de marchés publics. Seules les annonces confirmées en cours sont publiées, chacune avec sa date de publication. <a href="sources.html">D'où viennent les annonces ?</a> Fond de carte © Esri, © OpenStreetMap contributors.</footer>
+
+</div><!-- /.page -->
 
 <div class="detail-overlay" id="overlay">
   <div class="detail-card" id="detailCard"></div>

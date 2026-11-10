@@ -39,12 +39,13 @@
 *{box-sizing:border-box;}
 body{
   background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif;
-  padding-inline:16px; padding-block:0 40px; max-width:1080px; margin:0 auto;
+  margin:0;
 }
+.page{max-width:1080px; margin:0 auto; padding:0 16px 40px;}
 h1,h2,h3{font-family:'Montserrat','IBM Plex Sans',system-ui,sans-serif; margin:0; text-wrap:balance;}
 a{color:var(--accent-ink);}
 
-.brand-banner{margin:0 -16px 0; height:clamp(78px,14vw,140px); overflow:hidden; background:#fff; border-bottom:4px solid transparent;
+.brand-banner{margin:0; height:clamp(78px,14vw,140px); overflow:hidden; background:#fff; border-bottom:4px solid transparent;
   border-image:linear-gradient(90deg,var(--accent) 0 50%,var(--ember) 50% 100%) 1;}
 .brand-banner img{display:block; width:100%; height:100%; object-fit:cover; object-position:center;}
 
@@ -132,6 +133,7 @@ footer a{color:var(--accent-ink); font-weight:600;}
 
 <div class="brand-banner"><img src="assets/geomark-banner.jpg" alt="Geomark Solutions SIG" width="1632" height="321"></div>
 
+<div class="page">
 <header class="top">
   <a class="back" href="index.html">← Retour à la carte</a>
   <h1>D'où viennent les annonces ?</h1>
@@ -189,6 +191,8 @@ footer a{color:var(--accent-ink); font-weight:600;}
 </div>
 
 <footer>Radar Emploi — maintenu par <a href="https://geomark-sig.fr">Geomark Solutions SIG</a>. Page générée automatiquement à partir des mêmes données que la carte.</footer>
+
+</div><!-- /.page -->
 
 <script>
 const STATS = {
