@@ -145,9 +145,14 @@ header.top .titles .lead{margin:8px 0 0; color:var(--text); font-size:15.5px; li
 :root[data-theme="dark"] .cluster-badge{box-shadow:0 0 0 4px rgba(90,160,221,.30);}
 .pt-dot{border-radius:50%; box-shadow:0 0 0 2px var(--surface); background:var(--open);}
 
-.list-head{display:flex; align-items:center; justify-content:space-between; padding:14px 16px 8px;}
-.list-head h3{font-size:16px;}
+.list-head{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; padding:14px 16px 8px;}
+.list-head h3{font-size:16px; margin-right:auto;}
 .list-head span{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-muted);}
+.bounds-toggle{
+  display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-muted); cursor:pointer;
+  user-select:none;
+}
+.bounds-toggle input{width:15px; height:15px; accent-color:var(--accent); cursor:pointer;}
 .list{max-height:420px; overflow-y:auto; border-top:1px solid var(--border);}
 .list-item{
   display:flex; gap:10px; padding:10px 16px; border-bottom:1px solid var(--border);
@@ -270,7 +275,11 @@ footer a{color:var(--accent-ink); font-weight:600;}
     </div>
   </div>
   <div class="panel">
-    <div class="list-head"><h3>Annonces visibles</h3><span id="listCount"></span></div>
+    <div class="list-head">
+      <h3>Annonces visibles</h3>
+      <label class="bounds-toggle"><input type="checkbox" id="boundsOnly" checked>Lister les annonces uniquement dans l'emprise de la carte</label>
+      <span id="listCount"></span>
+    </div>
     <div class="list" id="list"></div>
   </div>
 </div>
@@ -313,6 +322,7 @@ const state = {
   selected:null,
   types:new Set(Object.keys(TYPE_META)),
   query:'',
+  boundsOnly:true,   // liste limitée à l'emprise actuelle de la carte (pan/zoom) tant que la case reste cochée
 };
 
 function matchesQuery(p){
@@ -396,6 +406,22 @@ searchInput.addEventListener('input', ()=>{
 searchClear.addEventListener('click', ()=>{
   searchInput.value=''; state.query=''; searchClear.classList.remove('show'); renderAll();
 });
+
+document.getElementById('boundsOnly').addEventListener('change', (e)=>{
+  state.boundsOnly = e.target.checked;
+  renderList();
+});
+
+// Liste limitée à l'emprise visible de la carte : toutes les annonces dont le point tombe dans les
+// limites actuelles (pan/zoom confondus), indépendamment des marqueurs effectivement regroupés en cluster.
+function inMapBounds(p){
+  if(!map) return true;
+  return map.getBounds().contains([p.lat, p.lon]);
+}
+function listPoints(){
+  const pts = filteredPoints();
+  return state.boundsOnly ? pts.filter(inMapBounds) : pts;
+}
 
 // ---------- Leaflet map ----------
 let map, cluster, osmLayer, satLayer, tileErrorCount = 0, boundsFitted = false;
@@ -482,6 +508,9 @@ function initMap(){
     }
     lastZoom = z;
   });
+  // La liste suit le pan/zoom quand la case "emprise de la carte" est cochée ; sinon elle reste
+  // insensible aux mouvements de la carte (comportement d'avant cette fonctionnalité).
+  map.on('moveend', ()=>{ if(state.boundsOnly) renderList(); });
 
   document.getElementById('basemapToggle').addEventListener('click', (e)=>{
     const btn = e.target.closest('button');
@@ -576,11 +605,11 @@ function listItemHtml(p, isNew){
 }
 
 function renderList(){
-  const pts = filteredPoints();
+  const pts = listPoints();
   document.getElementById('listCount').textContent = pts.length + (pts.length>1?' annonces':' annonce');
   const el = document.getElementById('list');
   if(pts.length===0){
-    el.innerHTML = `<div class="list-empty">Aucune annonce ne correspond à ces filtres.</div>`;
+    el.innerHTML = `<div class="list-empty">${state.boundsOnly ? "Aucune annonce dans la zone affichée — déplacez ou dézoomez la carte." : "Aucune annonce ne correspond à ces filtres."}</div>`;
     return;
   }
   // Catégorie "Annonces d'aujourd'hui" : toutes celles détectées pour la première fois lors du
